@@ -11,7 +11,7 @@ description: Notes on edge AI, VLA models, inference, and model optimization.
   </header>
   <div class="post-list post-list-large">
     {% for post in site.posts %}
-    <a class="post-row" href="{{ post.url | relative_url }}">
+    <a class="post-row" href="{{ post.url | relative_url }}?v=20260811-9">
       <time>{{ post.date | date: "%b %-d, %Y" }}</time>
       <div>
         {% if post.tags %}<div class="post-tags">{% for tag in post.tags %}<span>{{ tag }}</span>{% endfor %}</div>{% endif %}

@@ -34,6 +34,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { passive: true });
 
   const topButton = document.querySelector('[data-scroll-top]');
+  const updateTopButton = () => {
+    if (!topButton) return;
+    const isVisible = window.scrollY > 180;
+    topButton.classList.toggle('is-visible', isVisible);
+    topButton.setAttribute('aria-hidden', String(!isVisible));
+    topButton.tabIndex = isVisible ? 0 : -1;
+  };
+
+  let topButtonFrame = null;
+  window.addEventListener('scroll', () => {
+    if (topButtonFrame !== null) return;
+    topButtonFrame = window.requestAnimationFrame(() => {
+      updateTopButton();
+      topButtonFrame = null;
+    });
+  }, { passive: true });
+  window.addEventListener('pageshow', updateTopButton);
+  window.addEventListener('load', updateTopButton);
+  updateTopButton();
+
   topButton?.addEventListener('click', () => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
