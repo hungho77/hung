@@ -280,6 +280,11 @@ img { display: block; max-width: 100%; }
 .post-content a { color: var(--sky-300); border-bottom: 1px solid rgba(142,210,255,.45); }
 .post-content code { padding: 2px 5px; border: 1px solid var(--line); border-radius: 4px; background: var(--navy-900); color: var(--sky-300); font-family: 'DM Mono', monospace; font-size: .85em; }
 .post-content blockquote { margin: 42px 0; padding-left: 25px; border-left: 3px solid var(--blue-500); color: var(--white); font-size: 24px; line-height: 1.45; }
+.post-content table { width: 100%; margin: 34px 0 44px; border-collapse: collapse; font-size: 13px; line-height: 1.55; }
+.post-content th, .post-content td { padding: 13px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.post-content th { color: var(--sky-300); font: 500 9px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .05em; }
+.post-content td { color: #b8cbe0; }
+.post-content tr:first-child th { border-top: 1px solid var(--line); }
 
 .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
 .reveal.is-visible { opacity: 1; transform: none; }
@@ -359,6 +364,8 @@ img { display: block; max-width: 100%; }
   .post-list-large .post-row h2 { font-size: 22px; }
   .post-header { padding-block: 75px 45px; }
   .post-content { font-size: 16px; }
+  .post-content table { display: block; overflow-x: auto; font-size: 12px; }
+  .post-content th, .post-content td { min-width: 145px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
