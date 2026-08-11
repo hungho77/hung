@@ -1,0 +1,23 @@
+title: "Thinh Hung Ho — AI Systems Engineer"
+description: "Portfolio and engineering notes by Thinh Hung Ho."
+url: "https://hungho77.github.io"
+baseurl: "/hung"
+markdown: kramdown
+permalink: /blog/:title/
+theme: null
+author:
+  name: "Thinh Hung Ho"
+  role: "Senior Edge AI Engineer at VinRobotics"
+  location: "Ho Chi Minh City, Vietnam"
+  github: "hungho77"
+  linkedin: "hunho77"
+  linkedin_url: "https://www.linkedin.com/in/hunho77"
+collections:
+  projects:
+    output: false
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: post
