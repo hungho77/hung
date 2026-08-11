@@ -5,15 +5,19 @@ description: Notes on edge AI, VLA models, inference, and model optimization.
 ---
 <main class="blog-page section-shell">
   <header class="blog-header">
-    <p class="section-index">ENGINEERING NOTES</p>
-    <h1>Ideas from the<br>systems layer.</h1>
-    <p>Working notes on edge AI, VLA models, inference performance, and the engineering details behind production-ready intelligence.</p>
+    <p class="section-index">PAPER NOTES · ENGINEERING LOGS</p>
+    <h1>Research,<br>made practical.</h1>
+    <p>English editions of my Notion paper notes, plus first-hand investigations from edge AI, VLA models, inference performance, and production systems.</p>
   </header>
   <div class="post-list post-list-large">
     {% for post in site.posts %}
     <a class="post-row" href="{{ post.url | relative_url }}">
       <time>{{ post.date | date: "%b %-d, %Y" }}</time>
-      <div><h2>{{ post.title }}</h2><p>{{ post.subtitle | default: post.excerpt | strip_html | truncate: 150 }}</p></div>
+      <div>
+        {% if post.tags %}<div class="post-tags">{% for tag in post.tags %}<span>{{ tag }}</span>{% endfor %}</div>{% endif %}
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.subtitle | default: post.excerpt | strip_html | truncate: 150 }}</p>
+      </div>
       <span>↗</span>
     </a>
     {% endfor %}
