@@ -1,5 +1,21 @@
 ---
 layout: default
-title: Blog
+title: Engineering Notes
+description: Notes on edge AI, VLA models, inference, and model optimization.
 ---
-<main class="blog-page section-shell"><header class="blog-header"><p class="eyebrow">Notes, ideas, and other things</p><h1>The blog<span class="spark">✳</span></h1><p>A corner of the internet for works in progress, useful links, and lessons learned along the way.</p></header><div class="post-list post-list-large">{% for post in site.posts %}<a class="post-row" href="{{ post.url | relative_url }}"><time>{{ post.date | date: "%b %-d, %Y" }}</time><div><h2>{{ post.title }}</h2>{% if post.excerpt %}<p>{{ post.excerpt | strip_html | truncate: 140 }}</p>{% endif %}</div><span class="arrow">↗</span></a>{% endfor %}</div></main>
+<main class="blog-page section-shell">
+  <header class="blog-header">
+    <p class="section-index">ENGINEERING NOTES</p>
+    <h1>Ideas from the<br>systems layer.</h1>
+    <p>Working notes on edge AI, VLA models, inference performance, and the engineering details behind production-ready intelligence.</p>
+  </header>
+  <div class="post-list post-list-large">
+    {% for post in site.posts %}
+    <a class="post-row" href="{{ post.url | relative_url }}">
+      <time>{{ post.date | date: "%b %-d, %Y" }}</time>
+      <div><h2>{{ post.title }}</h2><p>{{ post.subtitle | default: post.excerpt | strip_html | truncate: 150 }}</p></div>
+      <span>↗</span>
+    </a>
+    {% endfor %}
+  </div>
+</main>
