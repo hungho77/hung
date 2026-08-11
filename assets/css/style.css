@@ -43,11 +43,18 @@ img { display: block; max-width: 100%; }
   height: 88px;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   border-bottom: 1px solid var(--line);
   position: relative;
   z-index: 20;
 }
+.site-logo { width: 42px; height: 42px; display: block; color: var(--sky-300); transition: transform .2s, filter .2s; }
+.site-logo:hover { transform: translateY(-2px) rotate(-2deg); filter: drop-shadow(0 0 14px rgba(98,165,255,.35)); }
+.site-logo svg { width: 100%; height: 100%; overflow: visible; }
+.site-logo path { fill: none; stroke-linecap: square; stroke-linejoin: miter; }
+.logo-frame { stroke: rgba(98,165,255,.42); stroke-width: 1.2; fill: rgba(13,41,85,.36) !important; }
+.logo-letter { stroke: var(--white); stroke-width: 2.1; }
+.logo-signal { stroke: var(--blue-400); stroke-width: 2; }
 .site-header nav { display: flex; align-items: center; gap: 32px; font: 500 12px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .04em; }
 .site-header nav > a:not(.nav-pill) { color: var(--muted); transition: color .2s; }
 .site-header nav > a:not(.nav-pill):hover { color: var(--white); }
@@ -289,12 +296,10 @@ img { display: block; max-width: 100%; }
 .post-content td { color: #b8cbe0; }
 .post-content tr:first-child th { border-top: 1px solid var(--line); }
 
-.page-shortcuts { position: fixed; right: 22px; bottom: 22px; z-index: 40; display: flex; flex-direction: column; align-items: flex-end; gap: 9px; }
-.page-shortcut { min-height: 42px; padding: 0 15px; border: 1px solid rgba(98,165,255,.45); border-radius: 100px; background: rgba(3,16,32,.88); backdrop-filter: blur(12px); color: var(--sky-300); display: inline-flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 12px 34px rgba(0,0,0,.28); font: 500 9px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .06em; transition: transform .2s, background .2s, border-color .2s; }
+.page-shortcuts { position: fixed; right: 22px; bottom: 22px; z-index: 40; }
+.page-shortcut { width: 44px; height: 44px; padding: 0; border: 1px solid rgba(98,165,255,.45); border-radius: 50%; background: rgba(3,16,32,.88); backdrop-filter: blur(12px); color: var(--sky-300); display: grid; place-items: center; cursor: pointer; box-shadow: 0 12px 34px rgba(0,0,0,.28); transition: transform .2s, background .2s, border-color .2s; }
 .page-shortcut:hover { transform: translateY(-2px); border-color: var(--blue-400); background: var(--navy-800); }
-.page-shortcut span { color: var(--white); font-size: 14px; }
-.top-shortcut { font-family: 'DM Mono', monospace; }
-.page-shortcut[hidden] { display: none; }
+.page-shortcut span { color: var(--white); font: 500 20px 'DM Mono', monospace; transform: translateY(-1px); }
 
 .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
 .reveal.is-visible { opacity: 1; transform: none; }
@@ -320,7 +325,7 @@ img { display: block; max-width: 100%; }
   :root { --shell: calc(100% - 30px); }
   .section-block { padding-block: 82px; }
   .site-header { height: 74px; }
-  .site-header { justify-content: flex-end; }
+  .site-header { justify-content: space-between; }
   .menu-button { width: 38px; height: 38px; display: grid; place-content: center; gap: 6px; border: 1px solid var(--line); border-radius: 50%; background: transparent; }
   .menu-button span { width: 15px; height: 1px; background: var(--text); }
   .site-header nav { display: none; position: absolute; left: 0; right: 0; top: 73px; padding: 25px; border: 1px solid var(--line); border-radius: 0 0 14px 14px; background: rgba(3,16,32,.97); flex-direction: column; align-items: stretch; }
@@ -374,8 +379,8 @@ img { display: block; max-width: 100%; }
   .post-content { font-size: 16px; }
   .post-content table { display: block; overflow-x: auto; font-size: 12px; }
   .post-content th, .post-content td { min-width: 145px; }
-  .page-shortcuts { right: 13px; bottom: 13px; gap: 7px; }
-  .page-shortcut { min-height: 40px; padding-inline: 13px; }
+  .page-shortcuts { right: 13px; bottom: 13px; }
+  .page-shortcut { width: 40px; height: 40px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
