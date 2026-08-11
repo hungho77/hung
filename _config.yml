@@ -1,13 +1,13 @@
-title: "Thinh Hung Ho — AI Systems Engineer"
-description: "Portfolio and engineering notes by Thinh Hung Ho."
+title: "Ho Thinh Hung — Edge AI Engineer"
+description: "Edge AI, VLA, model optimization, and engineering notes by Ho Thinh Hung."
 url: "https://hungho77.github.io"
 baseurl: "/hung"
 markdown: kramdown
 permalink: /blog/:title/
 theme: null
 author:
-  name: "Thinh Hung Ho"
-  role: "Senior Edge AI Engineer at VinRobotics"
+  name: "Ho Thinh Hung"
+  role: "Senior Edge AI Engineer"
   location: "Ho Chi Minh City, Vietnam"
   github: "hungho77"
   linkedin: "hunho77"
