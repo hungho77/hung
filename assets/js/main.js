@@ -33,6 +33,17 @@ document.addEventListener('DOMContentLoaded', () => {
     glow.style.setProperty('--y', `${event.clientY}px`);
   }, { passive: true });
 
+  const topButton = document.querySelector('[data-scroll-top]');
+  const updateTopButton = () => {
+    if (topButton) topButton.hidden = window.scrollY < 520;
+  };
+  window.addEventListener('scroll', updateTopButton, { passive: true });
+  topButton?.addEventListener('click', () => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+  });
+  updateTopButton();
+
   const lab = document.querySelector('[data-precision-lab]');
   if (lab) {
     const datasets = {
