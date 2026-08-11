@@ -193,7 +193,10 @@ img { display: block; max-width: 100%; }
 .lab-heading .section-note { max-width: 355px; }
 .lab-shell { border: 1px solid rgba(98,165,255,.28); border-radius: 22px; overflow: hidden; background: linear-gradient(145deg, rgba(13,41,85,.72), rgba(4,18,38,.92)); box-shadow: 0 35px 90px rgba(0,0,0,.2); }
 .lab-toolbar { display: flex; gap: 0; border-bottom: 1px solid var(--line); }
-.lab-platform { min-width: 190px; padding: 18px 24px; border: 0; border-right: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; font: 500 10px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; }
+.lab-platform { min-width: 250px; padding: 16px 24px; border: 0; border-right: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; text-align: left; }
+.lab-platform span { display: block; font: 500 10px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; }
+.lab-platform small { display: block; margin-top: 6px; color: var(--blue-400); font: 500 8px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .04em; }
+.lab-platform.is-active small { color: var(--sky-300); }
 .lab-platform.is-active { color: var(--white); background: rgba(36,107,254,.18); box-shadow: inset 0 -2px var(--blue-500); }
 .lab-platform:focus-visible, .lab-method:focus-visible { outline: 2px solid var(--sky-300); outline-offset: -3px; }
 .lab-body { min-height: 470px; display: grid; grid-template-columns: .74fr 1.26fr; }
@@ -219,7 +222,7 @@ img { display: block; max-width: 100%; }
 .library-button { border: 1px solid rgba(98,165,255,.5); color: var(--sky-300); }
 .library-button:hover { background: var(--blue-600); border-color: var(--blue-600); color: white; }
 .research-intro { max-width: 620px; margin: -18px 0 42px; color: var(--muted); font-size: 16px; line-height: 1.7; }
-.research-grid { display: grid; grid-template-columns: 1.45fr 1fr 1fr; gap: 14px; }
+.research-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .research-card { min-height: 360px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: linear-gradient(155deg, rgba(13,41,85,.72), rgba(7,26,54,.62)); display: flex; flex-direction: column; transition: transform .3s, border-color .3s, background .3s; }
 .research-card:hover { transform: translateY(-6px); border-color: rgba(98,165,255,.55); background: linear-gradient(155deg, rgba(19,57,119,.78), rgba(7,26,54,.7)); }
 .research-featured { background: linear-gradient(145deg, rgba(36,107,254,.34), rgba(7,26,54,.75)); }
@@ -301,7 +304,6 @@ img { display: block; max-width: 100%; }
   .project-item { grid-template-columns: 1fr; }
   .project-visual { border-right: 0; border-bottom: 1px solid var(--line); }
   .research-grid { grid-template-columns: 1fr 1fr; }
-  .research-featured { grid-column: 1 / -1; }
   .post-content { margin-left: 0; }
   .lab-body { grid-template-columns: 1fr; }
   .lab-methods { grid-template-columns: repeat(3, 1fr); border-right: 0; border-bottom: 1px solid var(--line); }
@@ -337,7 +339,6 @@ img { display: block; max-width: 100%; }
   .expertise-card h3 { margin-top: 0; }
   .project-pair { grid-template-columns: 1fr; }
   .research-grid { grid-template-columns: 1fr; }
-  .research-featured { grid-column: auto; }
   .research-card { min-height: 330px; }
   .lab-toolbar { display: grid; grid-template-columns: 1fr 1fr; }
   .lab-platform { min-width: 0; padding-inline: 12px; }
