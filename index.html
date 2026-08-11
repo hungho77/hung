@@ -14,7 +14,6 @@ layout: default
       <div class="hero-links">
         <a href="https://github.com/hungho77">GitHub ↗</a>
         <a href="{{ site.author.linkedin_url }}">LinkedIn ↗</a>
-        <a href="https://app.notion.com/p/9b5af84c856f49ba9b67060315e58866?v=37787833c2f3800281eb000ce045b22a&amp;source=copy_link">Paper Notes ↗</a>
         <span>Ho Chi Minh City, Vietnam</span>
       </div>
     </div>
@@ -102,11 +101,12 @@ layout: default
           <div class="project-visual notes-art"><div class="speed-ring"><strong>2.11×</strong><span>POLICY SPEEDUP</span></div><div class="note-line line-a"></div><div class="note-line line-b"></div><div class="note-line line-c"></div></div>
           <div class="project-copy"><span class="project-type">VLA OPTIMIZATION</span><h3>Model Optimization Notes</h3><p>Hands-on notes and benchmarks for X-VLA, SmolVLA, quantization, pruning, and edge deployment.</p><div class="tag-row"><span>VLA</span><span>TensorRT</span><span>Pruna</span></div><b>View project <i>↗</i></b></div>
         </a>
-        <a class="project-item compact" href="https://github.com/hungho77/TensorRT-Edge-LLM">
+        <a class="project-item compact" href="{{ '/blog/debugging-tensorrt-edge-llm/' | relative_url }}">
           <div class="project-visual tensor-art"><div class="tensor-cube cube-one"></div><div class="tensor-cube cube-two"></div><div class="tensor-cube cube-three"></div><code>FP16 → INT8 → INT4</code></div>
-          <div class="project-copy"><span class="project-type">NVIDIA EDGE RUNTIME · BUG FIXES</span><h3>TensorRT Edge LLM</h3><p>Root-caused and fixed four garbled-generation defects across FP16, NVFP4, AWQ, and InternVL3. The Jetson Thor fix was validated by users and accepted for a following NVIDIA release.</p><div class="tag-row"><span>TensorRT</span><span>Jetson Thor</span><span>AWQ</span><span>NVFP4</span></div><b>View verified fixes <i>↗</i></b></div>
+          <div class="project-copy"><span class="project-type">NVIDIA EDGE RUNTIME · BUG FIXES</span><h3>Four bugs. One symptom.</h3><p>Controlled experiments separated Myelin and CASK fusion failures from lossy AWQ repacking and a silent InternVL3 exporter failure.</p><div class="tag-row"><span>TensorRT</span><span>Jetson Thor</span><span>AWQ</span><span>NVFP4</span></div><b>Read the experiment <i>→</i></b></div>
         </a>
       </div>
+
     </div>
   </section>
 
