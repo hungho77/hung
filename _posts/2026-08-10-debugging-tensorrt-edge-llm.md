@@ -1,7 +1,7 @@
 ---
-title: "Four bugs, one symptom: garbled Edge-LLM output"
-subtitle: "How I separated TensorRT fusion bugs, lossy AWQ repacking, and a silent InternVL3 export failure on NVIDIA edge hardware."
-date: 2026-08-10
+title: "TensorRT Edge-LLM: four fixes from controlled experiments"
+subtitle: "How I separated compiler fusion bugs, lossy AWQ repacking, and a silent InternVL3 export failure—and verified each fix on NVIDIA edge hardware."
+date: 2026-08-11 20:00:00 +0700
 permalink: /blog/debugging-tensorrt-edge-llm/
 tags: [TensorRT, Jetson, Debugging]
 ---
@@ -10,13 +10,35 @@ An engine that builds successfully and generates nonsense looks like one bug. In
 
 I reproduced and isolated the failures on Jetson Thor with TensorRT Edge-LLM. The fixes and their before/after validation are collected in my [`fixes/garbled-output`](https://github.com/hungho77/TensorRT-Edge-LLM/tree/fixes/garbled-output) branch.
 
+> “The proposed fix will be applied in the next release.” — [`nvluxiaoz`](https://github.com/NVIDIA/TensorRT-Edge-LLM/issues/151#issuecomment-5149783645), NVIDIA repository maintainer
+
+The investigation connects directly to NVIDIA issue [#151](https://github.com/NVIDIA/TensorRT-Edge-LLM/issues/151) and my consolidated experiment report in [issue #105](https://github.com/NVIDIA/TensorRT-Edge-LLM/issues/105#issuecomment-5235852406).
+
+## Experimental method
+
+All four defects produced the same user-visible result: a clean engine build followed by nonsensical generation. I treated correctness as the dependent variable and changed one factor at a time:
+
+- Keep the exported ONNX and prompts fixed while changing compiler fusion flags.
+- Compare fusion thresholds rather than swapping kernels, models, or checkpoints together.
+- Validate quantization transforms algebraically before rebuilding the full engine.
+- Compare exported checkpoint tensors against the original weights before blaming runtime execution.
+
+The main environment was Jetson Thor (`sm_110`), JetPack 7.1, and TensorRT 10.13.3.9. Platform-specific findings are labeled separately from representation bugs that affect any GPU.
+
+| Precision / model | Root cause | Controlled change | Verification |
+|---|---|---|---|
+| FP16 | Myelin `fc_h_fusion` version gate | Disable the miscompiled fusion on TRT 10.13/10.14 | Correct text and image generation; NVIDIA accepted the fix |
+| NVFP4 | CASK fusing two or more epilogues | Cap NVFP4 epilogue fusion at one | Same graph and tactic pool; output changes from garbage to correct |
+| INT4 AWQ | Asymmetric zero-points folded and clamped | Add an exact runtime correction term | Cosine similarity improves to `1.00000000` |
+| InternVL3-9B | InternLM2 keys silently unmatched | Convert the decoder to the supported layout | Bit-exact projection mapping and correct full-engine generation |
+
 ## 1. FP16 horizontal fully-connected fusion
 
 The FP16 failure came from Myelin horizontal fully-connected fusion. `gate_proj` and `up_proj` share the same layer-normalization output, which creates a fusion opportunity. On TensorRT 10.13 and `sm_110`, that fused path produced corrupted output.
 
 The runtime already had a workaround to disable `fc_h_fusion`, but its version gate started at TensorRT 10.15. Widening that gate fixed both text and vision-language generation on 10.13. The same Qwen2.5-0.5B engine changed from gibberish to “The capital of France is Paris.”
 
-This diagnosis was discussed in NVIDIA issues [#151](https://github.com/NVIDIA/TensorRT-Edge-LLM/issues/151) and [#105](https://github.com/NVIDIA/TensorRT-Edge-LLM/issues/105). Other users reproduced the fix, and an NVIDIA maintainer confirmed it would be applied in a following release.
+Other users reproduced the fix in NVIDIA issues #151 and #105. The maintainer then confirmed that the proposed change would be triggered in NVIDIA’s internal development flow rather than requiring an external merge request.
 
 ## 2. NVFP4 CASK epilogue fusion
 
