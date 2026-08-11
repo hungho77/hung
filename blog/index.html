@@ -1,0 +1,5 @@
+---
+layout: default
+title: Blog
+---
+<main class="blog-page section-shell"><header class="blog-header"><p class="eyebrow">Notes, ideas, and other things</p><h1>The blog<span class="spark">✳</span></h1><p>A corner of the internet for works in progress, useful links, and lessons learned along the way.</p></header><div class="post-list post-list-large">{% for post in site.posts %}<a class="post-row" href="{{ post.url | relative_url }}"><time>{{ post.date | date: "%b %-d, %Y" }}</time><div><h2>{{ post.title }}</h2>{% if post.excerpt %}<p>{{ post.excerpt | strip_html | truncate: 140 }}</p>{% endif %}</div><span class="arrow">↗</span></a>{% endfor %}</div></main>
