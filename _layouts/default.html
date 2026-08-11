@@ -11,8 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v=20260811-6">
-  <script defer src="{{ '/assets/js/main.js' | relative_url }}?v=20260811-6"></script>
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v=20260811-7">
+  <script defer src="{{ '/assets/js/main.js' | relative_url }}?v=20260811-7"></script>
 </head>
 <body>
   <div class="page-glow" aria-hidden="true"></div>
@@ -28,6 +28,11 @@
   </header>
 
   {{ content }}
+
+  <div class="page-shortcuts" aria-label="Page shortcuts">
+    {% unless page.url == '/' %}<a class="page-shortcut home-shortcut" href="{{ '/' | relative_url }}" aria-label="Back to homepage"><span>⌂</span> Home</a>{% endunless %}
+    <button class="page-shortcut top-shortcut" type="button" data-scroll-top aria-label="Back to top" hidden><span>↑</span> Top</button>
+  </div>
 
   <footer class="site-footer">
     <div class="section-shell footer-grid">
