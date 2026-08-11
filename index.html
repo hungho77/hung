@@ -113,13 +113,13 @@ layout: default
   <section id="precision-lab" class="precision-lab section-shell section-block reveal" data-precision-lab>
     <div class="section-title-row lab-heading">
       <div><p class="section-index">04 / PRECISION LAB</p><h2>Choose the<br>right trade-off.</h2></div>
-      <p class="section-note">Real measurements from my ModelOpt recipes. Select a platform and dtype to compare memory, latency, throughput, and accuracy.</p>
+      <p class="section-note">Real measurements from my ModelOpt recipes—including BF16, FP8, NVFP4, INT8 SmoothQuant, and INT4 AWQ.</p>
     </div>
 
     <div class="lab-shell">
       <div class="lab-toolbar" role="tablist" aria-label="Benchmark platform">
-        <button type="button" class="lab-platform is-active" data-platform="rtx" role="tab" aria-selected="true">RTX 5090</button>
-        <button type="button" class="lab-platform" data-platform="jetson" role="tab" aria-selected="false">Jetson Orin Nano</button>
+        <button type="button" class="lab-platform is-active" data-platform="rtx" role="tab" aria-selected="true"><span>RTX 5090</span><small>BF16 · FP8 · NVFP4</small></button>
+        <button type="button" class="lab-platform" data-platform="jetson" role="tab" aria-selected="false"><span>Jetson Orin Nano</span><small>INT8 SmoothQuant · INT4 AWQ</small></button>
       </div>
       <div class="lab-body">
         <div class="lab-methods" aria-label="Precision options"></div>
@@ -133,17 +133,24 @@ layout: default
           </div>
         </div>
       </div>
-      <div class="lab-foot"><span data-lab-context>Qwen3-ASR-1.7B · vLLM · RTX 5090</span><a href="https://github.com/hungho77/model-quantization-recipes">Benchmark source ↗</a></div>
+      <div class="lab-foot"><span data-lab-context>Qwen3-ASR-1.7B · vLLM · RTX 5090</span><a href="https://github.com/hungho77/model-quantization-recipes" target="_blank" rel="noopener noreferrer">Benchmark source ↗</a></div>
     </div>
   </section>
 
   <section id="research" class="research section-shell section-block reveal">
     <div class="section-title-row">
-      <div><p class="section-index">05 / PAPER NOTES</p><h2>I read to build<br>better systems.</h2></div>
-      <a class="button library-button" href="https://app.notion.com/p/9b5af84c856f49ba9b67060315e58866?v=37787833c2f3800281eb000ce045b22a&amp;source=copy_link" target="_blank" rel="noopener">Open Notion library <span>↗</span></a>
+      <div><p class="section-index">05 / LEARNING IN PUBLIC</p><h2>Learning<br>in public.</h2></div>
+      <a class="button library-button" href="{{ '/blog/' | relative_url }}">Browse all notes <span>→</span></a>
     </div>
-    <p class="research-intro">Selected notes now live here as full English articles—edited from my Notion research library and focused on practical engineering decisions.</p>
+    <p class="research-intro">Paper notes and first-hand engineering experiments, rewritten as practical English articles about the decisions behind fast, reliable edge AI.</p>
     <div class="research-grid">
+      <a class="research-card research-featured" href="{{ '/blog/debugging-tensorrt-edge-llm/' | relative_url }}">
+        <div class="research-top"><span>TENSORRT · DEBUGGING</span><i>EXPERIMENT</i></div>
+        <h3>Four bugs. One symptom.</h3>
+        <p>Controlled experiments that isolated four garbled-generation failures across FP16, NVFP4, AWQ, and InternVL3—with NVIDIA maintainer confirmation.</p>
+        <div class="paper-diagram"><span>REPRODUCE</span><b>→</b><span>ISOLATE</span><b>→</b><span>VERIFY</span></div>
+        <strong>Read experiment →</strong>
+      </a>
       <a class="research-card research-featured" href="{{ '/blog/vla-perf-inference-performance/' | relative_url }}">
         <div class="research-top"><span>VLA · PERFORMANCE</span><i>NEW</i></div>
         <h3>How Fast Can I Run My VLA?</h3>
@@ -175,18 +182,6 @@ layout: default
         <div><h3>Vision</h3><p>DeepStream · YOLO · OpenCV · VLMs</p></div>
         <div><h3>Systems</h3><p>Docker · Kafka · Redis · WebRTC</p></div>
       </div>
-    </div>
-  </section>
-
-  <section class="writing section-shell section-block reveal">
-    <div class="section-title-row">
-      <div><p class="section-index">07 / ENGINEERING NOTES</p><h2>Learning in public.</h2></div>
-      <a class="inline-link" href="{{ '/blog/' | relative_url }}">Browse all notes ↗</a>
-    </div>
-    <div class="post-list">
-      {% for post in site.posts limit:3 %}
-      <a class="post-row" href="{{ post.url | relative_url }}"><time>{{ post.date | date: "%b %-d, %Y" }}</time><div><h3>{{ post.title }}</h3><p>{{ post.subtitle }}</p></div><span>↗</span></a>
-      {% endfor %}
     </div>
   </section>
 </main>
