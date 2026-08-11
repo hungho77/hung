@@ -1,4 +1,12 @@
 ---
 layout: default
 ---
-<main class="post-page section-shell"><a class="back-link" href="{{ '/blog/' | relative_url }}">← Back to the blog</a><header class="post-header"><p class="eyebrow">{{ page.date | date: "%B %-d, %Y" }}</p><h1>{{ page.title }}</h1>{% if page.subtitle %}<p class="post-subtitle">{{ page.subtitle }}</p>{% endif %}</header><article class="post-content">{{ content }}</article></main>
+<main class="post-page section-shell">
+  <a class="back-link" href="{{ '/blog/' | relative_url }}">← All engineering notes</a>
+  <header class="post-header">
+    <p class="section-index">{{ page.date | date: "%B %-d, %Y" }}</p>
+    <h1>{{ page.title }}</h1>
+    {% if page.subtitle %}<p class="post-subtitle">{{ page.subtitle }}</p>{% endif %}
+  </header>
+  <article class="post-content">{{ content }}</article>
+</main>
