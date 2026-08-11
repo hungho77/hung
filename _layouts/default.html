@@ -11,12 +11,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v=20260811-7">
-  <script defer src="{{ '/assets/js/main.js' | relative_url }}?v=20260811-7"></script>
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v=20260811-8">
+  <script defer src="{{ '/assets/js/main.js' | relative_url }}?v=20260811-8"></script>
 </head>
 <body>
   <div class="page-glow" aria-hidden="true"></div>
   <header class="site-header section-shell">
+    <a class="site-logo" href="{{ '/' | relative_url }}" aria-label="Ho Thinh Hung — Home">
+      <svg viewBox="0 0 42 42" aria-hidden="true" focusable="false">
+        <path class="logo-frame" d="M5 5h23l9 9v23H5z"/>
+        <path class="logo-letter" d="M11 11v20m0-10h9m0-10v20M25 11h8m-4 0v20"/>
+        <path class="logo-signal" d="M32 5v8h8"/>
+      </svg>
+    </a>
     <button class="menu-button" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span></button>
     <nav>
       <a href="{{ '/' | relative_url }}#work">Work</a>
@@ -30,8 +37,7 @@
   {{ content }}
 
   <div class="page-shortcuts" aria-label="Page shortcuts">
-    {% unless page.url == '/' %}<a class="page-shortcut home-shortcut" href="{{ '/' | relative_url }}" aria-label="Back to homepage"><span>⌂</span> Home</a>{% endunless %}
-    <button class="page-shortcut top-shortcut" type="button" data-scroll-top aria-label="Back to top" hidden><span>↑</span> Top</button>
+    <button class="page-shortcut top-shortcut" type="button" data-scroll-top aria-label="Back to top"><span aria-hidden="true">↑</span></button>
   </div>
 
   <footer class="site-footer">
