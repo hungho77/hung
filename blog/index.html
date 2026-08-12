@@ -5,13 +5,13 @@ description: Notes on edge AI, VLA models, inference, and model optimization.
 ---
 <main class="blog-page section-shell">
   <header class="blog-header">
-    <p class="section-index">PAPER NOTES · ENGINEERING LOGS</p>
+    <p class="section-index">LEARNING IN PUBLIC · ENGINEERING LOGS</p>
     <h1>Research,<br>made practical.</h1>
-    <p>English editions of my Notion paper notes, plus first-hand investigations from edge AI, VLA models, inference performance, and production systems.</p>
+    <p>Research notes rewritten as practical English articles, plus first-hand investigations from edge AI, VLA models, inference performance, and production systems.</p>
   </header>
   <div class="post-list post-list-large">
     {% for post in site.posts %}
-    <a class="post-row" href="{{ post.url | relative_url }}?v=20260811-9">
+    <a class="post-row" href="{{ post.url | relative_url }}?v=20260812-1">
       <time>{{ post.date | date: "%b %-d, %Y" }}</time>
       <div>
         {% if post.tags %}<div class="post-tags">{% for tag in post.tags %}<span>{{ tag }}</span>{% endfor %}</div>{% endif %}

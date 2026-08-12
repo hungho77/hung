@@ -4,7 +4,6 @@ subtitle: "Why activation outliers break naive W8A8 quantization, and how equiva
 date: 2026-07-03
 permalink: /blog/smoothquant-explained/
 tags: [Quantization, LLM, W8A8]
-source_url: "https://app.notion.com/p/39287833c2f3805c936acb9bb80cf853"
 ---
 
 Weight-only quantization reduces model size, but it does not unlock a fully INT8 matrix-multiplication path. SmoothQuant targets **W8A8**: INT8 weights and INT8 activations, so Tensor Cores can accelerate both prefill and batched inference while activation memory also shrinks.
@@ -54,4 +53,4 @@ Evaluation should include action-level behavior—not only perplexity. I look fo
 
 SmoothQuant’s lasting lesson is architectural: move expensive complexity out of the runtime path whenever an algebraically equivalent offline transformation can do the same job.
 
-_Adapted and translated from my [Notion Paper Notes]({{ page.source_url }}). Read the [SmoothQuant paper](https://arxiv.org/abs/2211.10438)._
+_Read the original [SmoothQuant paper](https://arxiv.org/abs/2211.10438)._

@@ -4,7 +4,6 @@ subtitle: "A practical map of compute, memory, network, and action-generation bo
 date: 2026-08-11
 permalink: /blog/vla-perf-inference-performance/
 tags: [VLA, Robotics, Performance]
-source_url: "https://app.notion.com/p/3b987833c2f380889f49ea8c57800136"
 ---
 
 A Vision-Language-Action model is not one workload. It is a pipeline: a vision encoder turns camera frames into tokens, a language backbone reasons over the observation and instruction, and an action expert turns that context into controls. Each stage can hit a different hardware limit.
@@ -54,4 +53,4 @@ Finally, validate with task-level metrics. Perplexity and hidden-state similarit
 
 VLA performance is a systems problem. Model architecture, hardware, network topology, and control strategy are coupled. The most useful optimization is not always the most aggressive quantization—it is the change that removes the current bottleneck without creating a worse one downstream.
 
-_Adapted and translated from my [Notion Paper Notes]({{ page.source_url }})._
+_Read the original [VLA-Perf paper](https://arxiv.org/abs/2602.18397)._

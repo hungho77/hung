@@ -4,7 +4,6 @@ subtitle: "An engineering explanation of salient channels, INT4 weight-only quan
 date: 2026-06-06
 permalink: /blog/awq-explained/
 tags: [Quantization, LLM, INT4]
-source_url: "https://app.notion.com/p/37787833c2f380ceb7c4d8dc42ce05e4"
 ---
 
 AWQ is a post-training, weight-only quantization method designed to compress language and vision-language models to INT4 or INT3 without retraining. Its central observation is that weights do not matter equally—and activation statistics tell us which channels are most sensitive.
@@ -49,4 +48,4 @@ SmoothQuant targets W8A8 and is attractive when prefill or batched inference is 
 
 For edge VLA deployment, I would consider AWQ for large memory-bound language or action-decoder blocks, while preserving sensitive visual and control layers at a higher precision. The right answer should come from layerwise error analysis and a closed-loop task evaluation—not from bit width alone.
 
-_Adapted and translated from my [Notion Paper Notes]({{ page.source_url }}). Read the [AWQ paper](https://arxiv.org/abs/2306.00978)._
+_Read the original [AWQ paper](https://arxiv.org/abs/2306.00978)._
