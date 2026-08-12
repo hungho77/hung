@@ -4,6 +4,9 @@ subtitle: "How Hessian-aware error compensation, lazy updates, and Cholesky refo
 date: 2026-08-12 18:00:00 +0700
 permalink: /blog/gptq-second-order-quantization/
 tags: [GPTQ, INT4, LLM]
+learning_order: 5
+paper_year: "2022"
+learning_stage: Weight quantization
 ---
 
 Round-to-nearest treats every weight error as independent. GPTQ asks a better question: after quantizing one weight, how should the remaining full-precision weights move so the layer output stays close to the original?

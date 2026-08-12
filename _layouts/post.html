@@ -1,13 +1,51 @@
 ---
 layout: default
 ---
-<main class="post-page section-shell">
-  <a class="back-link" href="{{ '/blog/' | relative_url }}?v=20260812-1">← All engineering notes</a>
+<div class="reading-progress" aria-hidden="true"><span data-reading-progress></span></div>
+<main class="post-page section-shell" data-post-page>
+  <a class="back-link" href="{{ '/blog/' | relative_url }}?v=20260812-2">← All engineering notes</a>
   <header class="post-header">
-    <p class="section-index">{{ page.date | date: "%B %-d, %Y" }}</p>
+    <p class="section-index">STEP {{ page.learning_order }} · {{ page.paper_year }} · {{ page.learning_stage }}</p>
     <h1>{{ page.title }}</h1>
     {% if page.subtitle %}<p class="post-subtitle">{{ page.subtitle }}</p>{% endif %}
     {% if page.tags %}<div class="post-tags post-header-tags">{% for tag in page.tags %}<span>{{ tag }}</span>{% endfor %}</div>{% endif %}
+    <div class="post-reading-meta" aria-label="Article information">
+      <span><strong data-read-minutes>—</strong> min read</span>
+      <span><strong data-section-count>—</strong> sections</span>
+      <span><i aria-hidden="true"></i> {{ page.paper_year }} · {{ page.learning_stage }}</span>
+    </div>
   </header>
-  <article class="post-content">{{ content }}</article>
+  <div class="post-reading-layout">
+    <aside class="post-map" aria-label="Article map">
+      <div class="post-map-inner">
+        <div class="post-map-heading"><span>Article map</span><strong data-map-percent>0%</strong></div>
+        <nav data-post-toc></nav>
+        <div class="post-map-track" aria-hidden="true"><span data-map-progress></span></div>
+      </div>
+    </aside>
+    <article class="post-content" data-post-content>{{ content }}</article>
+  </div>
+  {% assign learning_posts = site.posts | sort: "learning_order" %}
+  {% assign next_note = nil %}
+  {% for note in learning_posts %}
+    {% if note.url == page.url %}
+      {% assign next_index = forloop.index0 | plus: 1 %}
+      {% assign next_note = learning_posts[next_index] %}
+    {% endif %}
+  {% endfor %}
+  <nav class="learning-next" aria-label="Continue the learning path">
+    {% if next_note %}
+    <a href="{{ next_note.url | relative_url }}?v=20260812-2">
+      <span>Continue learning · Step {{ next_note.learning_order }}</span>
+      <strong>{{ next_note.title }}</strong>
+      <i>Next note →</i>
+    </a>
+    {% else %}
+    <a href="{{ '/blog/' | relative_url }}?v=20260812-2">
+      <span>Learning path complete</span>
+      <strong>Return to the research library</strong>
+      <i>View all notes →</i>
+    </a>
+    {% endif %}
+  </nav>
 </main>

@@ -4,6 +4,9 @@ subtitle: "From learned Givens rotations to an INT4 TensorRT pipeline—and what
 date: 2026-08-12 16:00:00 +0700
 permalink: /blog/paroquant-pairwise-rotations/
 tags: [ParoQuant, TensorRT, Experiment]
+learning_order: 9
+paper_year: "2025"
+learning_stage: Efficient rotation
 ---
 
 Rotation-based quantization improves accuracy by spreading outliers across channels. The deployment problem is that a dense learned rotation can cost enough to erase the latency saved by INT4.

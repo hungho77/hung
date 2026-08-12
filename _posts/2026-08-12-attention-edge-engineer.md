@@ -4,6 +4,9 @@ subtitle: "The Transformer shape flow, why training parallelizes, and where auto
 date: 2026-08-12 19:00:00 +0700
 permalink: /blog/attention-from-the-edge/
 tags: [Transformer, Attention, Edge AI]
+learning_order: 2
+paper_year: "2017"
+learning_stage: Foundation
 ---
 
 The most important systems consequence of *Attention Is All You Need* is not that recurrence disappeared. It is that sequence modeling became dominated by matrix operations that accelerators can parallelize—until autoregressive inference puts a sequential loop back around the model.

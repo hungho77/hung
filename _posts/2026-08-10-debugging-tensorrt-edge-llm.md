@@ -4,6 +4,9 @@ subtitle: "How I separated compiler fusion bugs, lossy AWQ repacking, and a sile
 date: 2026-08-11 20:00:00 +0700
 permalink: /blog/debugging-tensorrt-edge-llm/
 tags: [TensorRT, Jetson, Debugging]
+learning_order: 11
+paper_year: "Production"
+learning_stage: Debugging
 ---
 
 An engine that builds successfully and generates nonsense looks like one bug. In this case it was four independent defects: two TensorRT 10.13 fusion problems, one incorrect AWQ zero-point transformation, and one unsupported InternLM2 checkpoint layout that silently exported random weights.

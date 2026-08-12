@@ -4,6 +4,9 @@ subtitle: "A practical field guide to INT8, INT4, FP8, NVFP4, and the measuremen
 date: 2026-08-12 21:00:00 +0700
 permalink: /blog/quantization-field-guide/
 tags: [Quantization, Edge AI, VLA]
+learning_order: 1
+paper_year: "Start here"
+learning_stage: Orientation
 ---
 
 Quantization is usually introduced as a conversion from floating-point values to fewer bits. That definition is mathematically correct and operationally incomplete.

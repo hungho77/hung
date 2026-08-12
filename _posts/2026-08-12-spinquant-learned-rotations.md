@@ -4,6 +4,9 @@ subtitle: "Why learned rotations tame activation outliers and make W4A4KV4 much 
 date: 2026-08-12 17:00:00 +0700
 permalink: /blog/spinquant-learned-rotations/
 tags: [SpinQuant, Rotation, W4A4KV4]
+learning_order: 8
+paper_year: "2024"
+learning_stage: Learned rotation
 ---
 
 Low-bit quantization is hardest when a few channels carry extreme values. One scale must cover those outliers, leaving the rest of the tensor with a coarse grid. SpinQuant changes the coordinate system before rounding so the same information is distributed more evenly.

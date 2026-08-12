@@ -4,6 +4,9 @@ subtitle: "A practical map of compute, memory, network, and action-generation bo
 date: 2026-08-11
 permalink: /blog/vla-perf-inference-performance/
 tags: [VLA, Robotics, Performance]
+learning_order: 10
+paper_year: "Applied"
+learning_stage: System design
 ---
 
 A Vision-Language-Action model is not one workload. It is a pipeline: a vision encoder turns camera frames into tokens, a language backbone reasons over the observation and instruction, and an action expert turns that context into controls. Each stage can hit a different hardware limit.

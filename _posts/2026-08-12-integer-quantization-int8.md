@@ -4,6 +4,9 @@ subtitle: "Range mapping, calibration, partial quantization, and a production wo
 date: 2026-08-12 20:00:00 +0700
 permalink: /blog/integer-quantization-int8/
 tags: [INT8, Calibration, Edge AI]
+learning_order: 3
+paper_year: "2020"
+learning_stage: Foundation
 ---
 
 INT8 is mature enough to look easy. Pick a range, map floating-point values into 256 levels, and let the accelerator run faster. Most failed deployments happen in the details hidden by that sentence.

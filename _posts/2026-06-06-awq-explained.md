@@ -4,6 +4,9 @@ subtitle: "An engineering explanation of salient channels, INT4 weight-only quan
 date: 2026-06-06
 permalink: /blog/awq-explained/
 tags: [Quantization, LLM, INT4]
+learning_order: 6
+paper_year: "2023"
+learning_stage: Salience aware
 ---
 
 AWQ is a post-training, weight-only quantization method designed to compress language and vision-language models to INT4 or INT3 without retraining. Its central observation is that weights do not matter equally—and activation statistics tell us which channels are most sensitive.

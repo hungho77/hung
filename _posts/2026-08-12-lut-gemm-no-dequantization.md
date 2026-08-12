@@ -4,6 +4,9 @@ subtitle: "How binary-coded weights become lookup-table indices—and when that 
 date: 2026-08-12 15:00:00 +0700
 permalink: /blog/lut-gemm-no-dequantization/
 tags: [CUDA, LUT-GEMM, Kernel]
+learning_order: 7
+paper_year: "2022"
+learning_stage: Kernel design
 ---
 
 Most weight-only quantization follows a compromise: store weights in three or four bits, then unpack and dequantize them inside the matrix kernel before multiplying by FP16 activations.
