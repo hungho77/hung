@@ -7,6 +7,11 @@ tags: [Quantization, Edge AI, VLA]
 learning_order: 1
 paper_year: "Start here"
 learning_stage: Orientation
+visual_type: quant-map
+visual_title: "From continuous values to a hardware representation"
+visual_alt: "Animated diagram mapping floating point values onto a smaller discrete quantization grid"
+visual_caption: "Quantization maps a wide continuous range onto fewer levels. Compression only becomes speed when the target runtime executes that representation directly."
+visual_steps: ["Observe values", "Map to levels", "Check the kernel"]
 ---
 
 Quantization is usually introduced as a conversion from floating-point values to fewer bits. That definition is mathematically correct and operationally incomplete.

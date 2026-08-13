@@ -7,6 +7,11 @@ tags: [ParoQuant, TensorRT, Experiment]
 learning_order: 9
 paper_year: "2025"
 learning_stage: Efficient rotation
+visual_type: paro
+visual_title: "Rotate independent channel pairs"
+visual_alt: "Animated ParoQuant diagram applying small Givens rotations to channel pairs before packing them into INT4 lanes"
+visual_caption: "ParoQuant replaces a dense rotation with independent 2×2 Givens transforms, preserving useful flexibility while remaining practical for a GPU kernel."
+visual_steps: ["Pair channels", "Apply Givens", "Pack INT4 lanes"]
 ---
 
 Rotation-based quantization improves accuracy by spreading outliers across channels. The deployment problem is that a dense learned rotation can cost enough to erase the latency saved by INT4.

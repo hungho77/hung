@@ -7,6 +7,11 @@ tags: [Transformer, Attention, Edge AI]
 learning_order: 2
 paper_year: "2017"
 learning_stage: Foundation
+visual_type: attention
+visual_title: "A token gathers context through Q, K, and V"
+visual_alt: "Animated attention flow from input tokens through query key value projections and an attention matrix to a context token"
+visual_caption: "Queries choose what to retrieve, keys describe what each token offers, and values carry the information combined into the output context."
+visual_steps: ["Project Q · K · V", "Score relationships", "Mix the context"]
 ---
 
 The most important systems consequence of *Attention Is All You Need* is not that recurrence disappeared. It is that sequence modeling became dominated by matrix operations that accelerators can parallelize—until autoregressive inference puts a sequential loop back around the model.

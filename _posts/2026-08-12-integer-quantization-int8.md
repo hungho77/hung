@@ -7,6 +7,11 @@ tags: [INT8, Calibration, Edge AI]
 learning_order: 3
 paper_year: "2020"
 learning_stage: Foundation
+visual_type: int8
+visual_title: "Calibration chooses what the INT8 grid can see"
+visual_alt: "Animated activation histogram clipped into an eight bit integer ladder"
+visual_caption: "A narrow range clips outliers; a wide range wastes resolution. Calibration finds the operating point between those two errors."
+visual_steps: ["Observe the range", "Choose the grid", "Balance the error"]
 ---
 
 INT8 is mature enough to look easy. Pick a range, map floating-point values into 256 levels, and let the accelerator run faster. Most failed deployments happen in the details hidden by that sentence.

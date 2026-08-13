@@ -7,6 +7,11 @@ tags: [TensorRT, Jetson, Debugging]
 learning_order: 11
 paper_year: "Production"
 learning_stage: Debugging
+visual_type: debug
+visual_title: "One symptom can hide four independent failures"
+visual_alt: "Animated TensorRT debugging decision flow branching garbled output into Myelin CASK AWQ and exporter investigations"
+visual_caption: "Controlled experiments change one variable at a time, turning a vague bad-output symptom into isolated compiler, quantization, and export defects."
+visual_steps: ["Reproduce symptom", "Isolate one cause", "Patch and verify"]
 ---
 
 An engine that builds successfully and generates nonsense looks like one bug. In this case it was four independent defects: two TensorRT 10.13 fusion problems, one incorrect AWQ zero-point transformation, and one unsupported InternLM2 checkpoint layout that silently exported random weights.

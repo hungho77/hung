@@ -3,7 +3,7 @@ layout: default
 ---
 <div class="reading-progress" aria-hidden="true"><span data-reading-progress></span></div>
 <main class="post-page section-shell" data-post-page>
-  <a class="back-link" href="{{ '/blog/' | relative_url }}?v=20260812-2">← All engineering notes</a>
+  <a class="back-link" href="{{ '/blog/' | relative_url }}?v=20260813-1">← All engineering notes</a>
   <header class="post-header">
     <p class="section-index">STEP {{ page.learning_order }} · {{ page.paper_year }} · {{ page.learning_stage }}</p>
     <h1>{{ page.title }}</h1>
@@ -15,6 +15,7 @@ layout: default
       <span><i aria-hidden="true"></i> {{ page.paper_year }} · {{ page.learning_stage }}</span>
     </div>
   </header>
+  {% include article-visual.html %}
   <div class="post-reading-layout">
     <aside class="post-map" aria-label="Article map">
       <div class="post-map-inner">
@@ -35,13 +36,13 @@ layout: default
   {% endfor %}
   <nav class="learning-next" aria-label="Continue the learning path">
     {% if next_note %}
-    <a href="{{ next_note.url | relative_url }}?v=20260812-2">
+    <a href="{{ next_note.url | relative_url }}?v=20260813-1">
       <span>Continue learning · Step {{ next_note.learning_order }}</span>
       <strong>{{ next_note.title }}</strong>
       <i>Next note →</i>
     </a>
     {% else %}
-    <a href="{{ '/blog/' | relative_url }}?v=20260812-2">
+    <a href="{{ '/blog/' | relative_url }}?v=20260813-1">
       <span>Learning path complete</span>
       <strong>Return to the research library</strong>
       <i>View all notes →</i>

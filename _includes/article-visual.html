@@ -1,0 +1,74 @@
+<figure class="article-visual visual-{{ page.visual_type }}" data-article-visual>
+  <header class="visual-header">
+    <div><span>CONCEPT VISUAL · {{ page.paper_year }}</span><strong>{{ page.visual_title }}</strong></div>
+    <button type="button" data-visual-toggle aria-pressed="false"><i aria-hidden="true"></i><span>Pause motion</span></button>
+  </header>
+  <div class="visual-canvas" role="img" aria-label="{{ page.visual_alt }}">
+    {% case page.visual_type %}
+    {% when 'quant-map' %}
+      <div class="quant-spectrum visual-panel" data-visual-step="1"><small>FLOATING POINT</small><div class="spectrum-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><b>CONTINUOUS VALUES</b></div>
+      <div class="visual-transfer" data-visual-step="2"><span>scale + round</span><i>→</i></div>
+      <div class="quant-grid visual-panel" data-visual-step="2"><small>LOW PRECISION</small><div class="grid-cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><b>DISCRETE LEVELS</b></div>
+      <div class="visual-result" data-visual-step="3"><strong>4×</strong><span>smaller weights</span><small>Only useful when the runtime has the matching kernel.</small></div>
+    {% when 'attention' %}
+      <div class="token-stream" data-visual-step="1"><i>t₁</i><i>t₂</i><i>t₃</i><i>t₄</i></div>
+      <div class="qkv-stack" data-visual-step="1"><span>Q<small>query</small></span><span>K<small>key</small></span><span>V<small>value</small></span></div>
+      <div class="attention-matrix visual-panel" data-visual-step="2"><small>ATTENTION SCORE</small><div class="matrix-cells">{% for i in (1..16) %}<i></i>{% endfor %}</div></div>
+      <div class="visual-transfer attention-transfer" data-visual-step="2"><span>weighted context</span><i>→</i></div>
+      <div class="context-token" data-visual-step="3"><b>z₄</b><small>context-aware token</small></div>
+    {% when 'int8' %}
+      <div class="range-chart visual-panel" data-visual-step="1"><small>CALIBRATION DISTRIBUTION</small><div class="range-bars">{% for i in (1..15) %}<i></i>{% endfor %}</div><span class="clip-line clip-left">CLIP</span><span class="clip-line clip-right">CLIP</span></div>
+      <div class="visual-transfer" data-visual-step="2"><span>choose range</span><i>→</i></div>
+      <div class="int8-ladder visual-panel" data-visual-step="2"><small>INT8 GRID</small>{% for i in (1..8) %}<i><b>{{ i }}</b></i>{% endfor %}</div>
+      <div class="visual-result" data-visual-step="3"><strong>256</strong><span>representable levels</span><small>Calibration balances clipping error against rounding error.</small></div>
+    {% when 'smoothquant' %}
+      <div class="smooth-side visual-panel" data-visual-step="1"><small>ACTIVATIONS · HARD</small><div class="smooth-bars activation-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div><b>OUTLIERS</b></div>
+      <div class="smooth-migration" data-visual-step="2"><span>offline scale</span><i>difficulty →</i></div>
+      <div class="smooth-side visual-panel" data-visual-step="2"><small>WEIGHTS · EASY</small><div class="smooth-bars weight-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div><b>ABSORB RANGE</b></div>
+      <div class="equivalence-chip" data-visual-step="3"><span>Y = (X / s) · (sW)</span><strong>same output</strong></div>
+    {% when 'gptq' %}
+      <div class="gptq-grid visual-panel" data-visual-step="1"><small>WEIGHT BLOCK</small><div>{% for i in (1..20) %}<i></i>{% endfor %}</div></div>
+      <div class="gptq-arrow" data-visual-step="2"><span>quantize one column</span><i>→</i></div>
+      <div class="error-wave" data-visual-step="2"><i></i><i></i><i></i><i></i><span>H⁻¹</span></div>
+      <div class="gptq-grid corrected visual-panel" data-visual-step="3"><small>COMPENSATED BLOCK</small><div>{% for i in (1..20) %}<i></i>{% endfor %}</div></div>
+      <p class="visual-callout" data-visual-step="3">Error is redistributed through the remaining weights—not left behind.</p>
+    {% when 'awq' %}
+      <div class="activation-probe visual-panel" data-visual-step="1"><small>ACTIVATION PROBE</small><div class="probe-wave"><i></i><i></i><i></i><i></i><i></i></div><b>Which channels matter?</b></div>
+      <div class="channel-bank visual-panel" data-visual-step="2"><small>WEIGHT CHANNELS</small>{% for i in (1..8) %}<i><span>c{{ i }}</span></i>{% endfor %}</div>
+      <div class="awq-shield" data-visual-step="2"><b>≈1%</b><span>salient weights</span></div>
+      <div class="visual-result" data-visual-step="3"><strong>W4A16</strong><span>INT4 weights · FP16 activations</span><small>Protect sensitive channels, then run a real weight-only kernel.</small></div>
+    {% when 'lut' %}
+      <div class="bit-packets visual-panel" data-visual-step="1"><small>PACKED WEIGHTS</small><span>101</span><span>011</span><span>110</span><span>001</span></div>
+      <div class="visual-transfer" data-visual-step="2"><span>use bits as address</span><i>→</i></div>
+      <div class="lookup-table visual-panel" data-visual-step="2"><small>LOOKUP TABLE</small>{% for i in (0..7) %}<i><span>{{ i }}</span><b>v{{ i }}</b></i>{% endfor %}</div>
+      <div class="visual-transfer" data-visual-step="3"><span>accumulate</span><i>→</i></div>
+      <div class="lut-output" data-visual-step="3"><b>Σ LUT[idx]</b><span>no weight reconstruction</span></div>
+    {% when 'spin' %}
+      <div class="rotation-space before visual-panel" data-visual-step="1"><small>BEFORE · OUTLIERS</small><div class="axis-x"></div><div class="axis-y"></div>{% for i in (1..12) %}<i></i>{% endfor %}</div>
+      <div class="rotation-operator" data-visual-step="2"><span>R</span><i>↻</i><small>learned rotation</small></div>
+      <div class="rotation-space after visual-panel" data-visual-step="3"><small>AFTER · BALANCED</small><div class="axis-x"></div><div class="axis-y"></div>{% for i in (1..12) %}<i></i>{% endfor %}</div>
+      <p class="visual-callout" data-visual-step="3">Same full-precision function. A basis that survives W4A4KV4.</p>
+    {% when 'paro' %}
+      <div class="pair-bank visual-panel" data-visual-step="1"><small>CHANNEL PAIRS</small><span>x₁ · x₂</span><span>x₃ · x₄</span><span>x₅ · x₆</span><span>x₇ · x₈</span></div>
+      <div class="pair-rotations" data-visual-step="2"><i>G(θ₁)</i><i>G(θ₂)</i><i>G(θ₃)</i><i>G(θ₄)</i></div>
+      <div class="int4-lanes visual-panel" data-visual-step="3"><small>GPU-FRIENDLY INT4 LANES</small><span></span><span></span><span></span><span></span></div>
+      <div class="visual-result" data-visual-step="3"><strong>2×2</strong><span>independent rotations</span><small>Enough flexibility to tame local outliers; enough structure to deploy.</small></div>
+    {% when 'vla' %}
+      <div class="vla-pipeline" data-visual-step="1"><div><i class="camera-eye"></i><span>CAMERA</span><small>pixels</small></div><b>→</b><div><i class="vision-grid"></i><span>VISION</span><small>tokens</small></div><b>→</b><div><i class="language-lines"></i><span>VLM</span><small>reasoning</small></div><b>→</b><div><i class="action-pulse"></i><span>ACTION</span><small>controls</small></div></div>
+      <div class="bottleneck-meter visual-panel" data-visual-step="2"><small>BOTTLENECK MOVES WITH THE WORKLOAD</small><span><i>VISION</i><b style="--meter:42%"></b></span><span><i>LANGUAGE</i><b style="--meter:88%"></b></span><span><i>ACTION</i><b style="--meter:31%"></b></span></div>
+      <p class="visual-callout" data-visual-step="3">Optimize the slow stage—not the most fashionable operator.</p>
+    {% when 'debug' %}
+      <div class="debug-graph visual-panel" data-visual-step="1"><small>ONE SYMPTOM</small><strong>garbled tokens</strong><span>ENGINE BUILDS ✓</span></div>
+      <div class="debug-branches" data-visual-step="2"><i>MYELIN</i><i>CASK</i><i>AWQ</i><i>EXPORT</i></div>
+      <div class="debug-probes" data-visual-step="2"><span>disable fusion</span><span>trace zeros</span><span>compare weights</span><span>validate logits</span></div>
+      <div class="debug-output" data-visual-step="3"><span>ISOLATE</span><b>→</b><span>PATCH</span><b>→</b><span>VERIFY</span><strong>clean output ✓</strong></div>
+    {% endcase %}
+  </div>
+  <div class="visual-steps" aria-label="Explore this concept">
+    {% for step in page.visual_steps %}
+    <button type="button" data-visual-phase="{{ forloop.index }}" aria-pressed="false"><small>0{{ forloop.index }}</small><span>{{ step }}</span></button>
+    {% endfor %}
+    <button class="visual-reset" type="button" data-visual-phase="all" aria-pressed="true"><small>↻</small><span>Full flow</span></button>
+  </div>
+  <figcaption><span>HOW TO READ IT</span>{{ page.visual_caption }}</figcaption>
+</figure>

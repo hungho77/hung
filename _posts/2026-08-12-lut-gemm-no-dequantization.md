@@ -7,6 +7,11 @@ tags: [CUDA, LUT-GEMM, Kernel]
 learning_order: 7
 paper_year: "2022"
 learning_stage: Kernel design
+visual_type: lut
+visual_title: "Use packed bits as lookup addresses"
+visual_alt: "Animated LUT GEMM diagram using packed low bit weights as indices into a lookup table before accumulation"
+visual_caption: "Instead of reconstructing every low-bit weight, LUT-GEMM uses its binary code as an address and accumulates precomputed products."
+visual_steps: ["Read packed bits", "Lookup products", "Accumulate directly"]
 ---
 
 Most weight-only quantization follows a compromise: store weights in three or four bits, then unpack and dequantize them inside the matrix kernel before multiplying by FP16 activations.

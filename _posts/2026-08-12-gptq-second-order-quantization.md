@@ -7,6 +7,11 @@ tags: [GPTQ, INT4, LLM]
 learning_order: 5
 paper_year: "2022"
 learning_stage: Weight quantization
+visual_type: gptq
+visual_title: "Quantize, then compensate the remaining weights"
+visual_alt: "Animated GPTQ block diagram showing sequential weight quantization and Hessian guided error compensation"
+visual_caption: "GPTQ uses approximate second-order information to push each local quantization error into weights that have not yet been quantized."
+visual_steps: ["Select a block", "Propagate error", "Keep output close"]
 ---
 
 Round-to-nearest treats every weight error as independent. GPTQ asks a better question: after quantizing one weight, how should the remaining full-precision weights move so the layer output stays close to the original?

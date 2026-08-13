@@ -7,6 +7,11 @@ tags: [Quantization, LLM, INT4]
 learning_order: 6
 paper_year: "2023"
 learning_stage: Salience aware
+visual_type: awq
+visual_title: "Let activations reveal the sensitive channels"
+visual_alt: "Animated AWQ diagram using activation magnitude to identify and protect salient weight channels"
+visual_caption: "AWQ observes activation statistics, protects a small set of salient channels through scaling, and quantizes the remaining weights aggressively."
+visual_steps: ["Probe activations", "Protect salience", "Run W4A16"]
 ---
 
 AWQ is a post-training, weight-only quantization method designed to compress language and vision-language models to INT4 or INT3 without retraining. Its central observation is that weights do not matter equally—and activation statistics tell us which channels are most sensitive.

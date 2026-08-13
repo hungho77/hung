@@ -24,6 +24,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { once: true });
   });
 
+  document.querySelectorAll('[data-article-visual]').forEach((visual) => {
+    const button = visual.querySelector('[data-visual-toggle]');
+    const label = button?.querySelector('span');
+    const canvas = visual.querySelector('.visual-canvas');
+    const phaseButtons = [...visual.querySelectorAll('[data-visual-phase]')];
+    button?.addEventListener('click', () => {
+      const paused = visual.classList.toggle('is-paused');
+      button.setAttribute('aria-pressed', String(paused));
+      button.setAttribute('aria-label', paused ? 'Play concept animation' : 'Pause concept animation');
+      if (label) label.textContent = paused ? 'Play motion' : 'Pause motion';
+    });
+    phaseButtons.forEach((phaseButton) => {
+      phaseButton.addEventListener('click', () => {
+        const phase = phaseButton.dataset.visualPhase;
+        if (phase === 'all') canvas?.removeAttribute('data-phase');
+        else canvas?.setAttribute('data-phase', phase);
+        phaseButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === phaseButton)));
+      });
+    });
+  });
+
   const postPage = document.querySelector('[data-post-page]');
   const postContent = document.querySelector('[data-post-content]');
   if (postPage && postContent) {

@@ -7,6 +7,11 @@ tags: [SpinQuant, Rotation, W4A4KV4]
 learning_order: 8
 paper_year: "2024"
 learning_stage: Learned rotation
+visual_type: spin
+visual_title: "Rotate the basis before rounding"
+visual_alt: "Animated SpinQuant coordinate rotation transforming an outlier-heavy distribution into a balanced distribution"
+visual_caption: "The full-precision function stays equivalent under an orthogonal rotation, but the rotated coordinates can be far easier to represent with four bits."
+visual_steps: ["See the outliers", "Learn a rotation", "Quantize the basis"]
 ---
 
 Low-bit quantization is hardest when a few channels carry extreme values. One scale must cover those outliers, leaving the rest of the tensor with a coarse grid. SpinQuant changes the coordinate system before rounding so the same information is distributed more evenly.

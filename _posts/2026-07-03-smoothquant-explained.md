@@ -7,6 +7,11 @@ tags: [Quantization, LLM, W8A8]
 learning_order: 4
 paper_year: "2022"
 learning_stage: Activation quantization
+visual_type: smoothquant
+visual_title: "Move quantization difficulty offline"
+visual_alt: "Animated SmoothQuant diagram moving activation outlier range into the weights while preserving the output"
+visual_caption: "SmoothQuant divides activations by a per-channel scale and multiplies weights by the same scale, preserving the product while making activations easier to quantize."
+visual_steps: ["Find outliers", "Migrate difficulty", "Preserve output"]
 ---
 
 Weight-only quantization reduces model size, but it does not unlock a fully INT8 matrix-multiplication path. SmoothQuant targets **W8A8**: INT8 weights and INT8 activations, so Tensor Cores can accelerate both prefill and batched inference while activation memory also shrinks.
