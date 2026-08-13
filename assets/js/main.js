@@ -38,8 +38,21 @@ document.addEventListener('DOMContentLoaded', () => {
     phaseButtons.forEach((phaseButton) => {
       phaseButton.addEventListener('click', () => {
         const phase = phaseButton.dataset.visualPhase;
-        if (phase === 'all') canvas?.removeAttribute('data-phase');
-        else canvas?.setAttribute('data-phase', phase);
+        const groups = [...visual.querySelectorAll('[data-visual-step]')];
+        if (phase === 'all') {
+          canvas?.removeAttribute('data-phase');
+          groups.forEach((group) => {
+            group.style.removeProperty('opacity');
+            group.style.removeProperty('filter');
+          });
+        } else {
+          canvas?.setAttribute('data-phase', phase);
+          groups.forEach((group) => {
+            const active = group.dataset.visualStep === phase;
+            group.style.setProperty('opacity', active ? '1' : '.16', 'important');
+            group.style.filter = active ? 'none' : 'saturate(.45)';
+          });
+        }
         phaseButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === phaseButton)));
       });
     });
