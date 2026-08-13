@@ -390,8 +390,8 @@ img { display: block; max-width: 100%; }
 .visual-steps button small { color: var(--blue-400); font: 500 8px 'DM Mono',monospace; }
 .visual-steps button span { font: 500 8px 'DM Mono',monospace; text-transform: uppercase; letter-spacing: .04em; line-height: 1.35; }
 .visual-canvas > [data-visual-step] { opacity: 1; filter: none; transition: opacity .3s, filter .3s, transform .3s; }
-.visual-canvas[data-phase] > [data-visual-step] { opacity: .16; filter: saturate(.45); }
-.visual-canvas[data-phase="1"] > [data-visual-step="1"], .visual-canvas[data-phase="2"] > [data-visual-step="2"], .visual-canvas[data-phase="3"] > [data-visual-step="3"] { opacity: 1; filter: none; transform: translateY(-3px); }
+.visual-canvas[data-phase] > [data-visual-step] { opacity: .16 !important; filter: saturate(.45); }
+.visual-canvas[data-phase="1"] > [data-visual-step="1"], .visual-canvas[data-phase="2"] > [data-visual-step="2"], .visual-canvas[data-phase="3"] > [data-visual-step="3"] { opacity: 1 !important; filter: none; transform: translateY(-3px); }
 
 /* Quantization field guide */
 .visual-quant-map .visual-canvas { grid-template-columns: 1fr 80px 1fr .75fr; }
