@@ -9,9 +9,9 @@ paper_year: "2022"
 learning_stage: Activation quantization
 visual_type: smoothquant
 paper_url: "https://arxiv.org/abs/2211.10438"
-visual_title: "Move quantization difficulty offline"
-visual_alt: "Animated SmoothQuant diagram moving activation outlier range into the weights while preserving the output"
-visual_caption: "SmoothQuant divides activations by a per-channel scale and multiplies weights by the same scale, preserving the product while making activations easier to quantize."
+visual_title: "Hard activations → balanced W8A8 tensors"
+visual_alt: "Interactive SmoothQuant diagram transforming a hard activation distribution with one outlier into a smooth easy distribution while weights absorb the channel scale"
+visual_caption: "Follow Figure 2’s logic: suppress activation outliers with a per-channel offline scale, move that variance into still-quantizable weights, and preserve XW exactly."
 visual_steps: ["Find outliers", "Migrate difficulty", "Preserve output"]
 ---
 

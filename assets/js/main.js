@@ -47,10 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
       { selector: '.visual-result', kicker: 'LIMIT', title: '256 representable codes', description: 'Signed INT8 provides 256 discrete codes. The scale determines how those codes cover the original real-valued range.', impact: 'The useful question is not “does INT8 work?” but which tensors, scales, and kernels make it work.' }
     ],
     smoothquant: [
-      { selector: '.activation-bars', kicker: 'PROBLEM', title: 'Activation outliers', description: 'A few channels can be much larger than the rest. One activation scale must cover those outliers, leaving coarse steps for normal values.', impact: 'This is the main reason naive W8A8 quantization can lose accuracy in large language models.' },
-      { selector: '.smooth-migration', kicker: 'TRANSFORMATION', title: 'Move difficulty offline', description: 'SmoothQuant divides activation channels by s and multiplies the matching weight channels by s before deployment.', impact: 'The operation is mathematically equivalent, so the full-precision layer output does not change.' },
-      { selector: '.weight-bars', kicker: 'WEIGHTS', title: 'Weights absorb the range', description: 'Weights are easier to quantize per output channel, so they absorb part of the activation outlier magnitude.', impact: 'The runtime receives smoother activations that fit a fast INT8 path.' },
-      { selector: '.equivalence-chip', kicker: 'INVARIANT', title: 'Same function, friendlier tensors', description: 'Y = (X / s)(sW) = XW. The model function is preserved before quantization; only the distribution of difficulty moves.', impact: 'Alpha controls how aggressively difficulty shifts from activations into weights.' }
+      { selector: '.sq-before', kicker: 'BEFORE · HARD', title: 'Activation outliers waste the INT8 range', description: 'A few input channels have magnitudes far above the rest. Per-tensor activation quantization must cover those peaks, so most values receive very few effective levels.', impact: 'The outlier channel—not the average value—sets the activation scale and causes large rounding error.' },
+      { selector: '.sq-transform', motionSelector: '.sq-before, .sq-transform, .sq-after, .sq-weight-path', kicker: 'OFFLINE TRANSFORMATION', title: 'Migrate scale variance from X to W', description: 'For every input channel j, SmoothQuant divides Xⱼ by sⱼ and multiplies the matching weight row Wⱼ by sⱼ. The animation moves difficulty from the hard activation chart into weights.', impact: 'With α = 0.5, sⱼ balances the maximum magnitudes of the corresponding activation and weight channels.' },
+      { selector: '.sq-after', kicker: 'AFTER · EASY', title: 'Smoothed activations use INT8 levels evenly', description: 'After X̂ = X · diag(s)⁻¹, the activation outlier is suppressed and channel ranges become comparable. The chart transitions from the original hard distribution to the smoothed one.', impact: 'Static per-tensor or per-token activation quantization now wastes far fewer codes on rare peaks.' },
+      { selector: '.sq-weight-path', kicker: 'WEIGHT SIDE', title: 'Adjusted weights absorb the variance', description: 'Ŵ = diag(s) · W carries the inverse scale, so some weight channels grow. The original flat distribution becomes more varied but remains quantizable.', impact: 'Weights start from a flat, quantization-friendly distribution; hardware-efficient per-output-channel weight scales provide additional tolerance.' },
+      { selector: '.sq-equivalence', kicker: 'INVARIANT', title: 'The linear layer is unchanged', description: 'X̂Ŵ = (X · diag(s)⁻¹)(diag(s) · W) = XW. SmoothQuant changes tensor ranges, not the full-precision function.', impact: 'The smoothing factors are calibrated and fused into previous operations offline, so runtime receives smooth activations without an extra scaling kernel.' }
     ],
     gptq: [
       { selector: '.gptq-grid:not(.corrected)', kicker: 'INPUT', title: 'A block of full-precision weights', description: 'GPTQ processes a layer in blocks so the reconstruction problem remains tractable on large models.', impact: 'The objective is to preserve layer outputs on calibration activations, not minimize raw weight distance.' },
@@ -124,8 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
         element.setAttribute('aria-pressed', 'true');
         element.closest('[data-visual-step]')?.classList.add('is-related');
       });
+      entry.motionElements.forEach((element) => element.closest('[data-visual-step]')?.classList.add('is-related'));
       void visual.offsetWidth;
-      entry.elements.forEach((element) => element.classList.add('is-explaining'));
+      entry.motionElements.forEach((element) => element.classList.add('is-explaining'));
       inspector?.classList.remove('is-updating');
       void inspector?.offsetWidth;
       inspector?.classList.add('is-updating');
@@ -141,12 +143,13 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: centeredTop, behavior: reduceMotion ? 'auto' : 'smooth' });
       }
       visual.explainTimer = window.setTimeout(() => {
-        entry.elements.forEach((element) => element.classList.remove('is-explaining'));
+        entry.motionElements.forEach((element) => element.classList.remove('is-explaining'));
       }, 2800);
     };
 
     entries.forEach((entry, index) => {
       entry.elements = [...visual.querySelectorAll(entry.selector)];
+      entry.motionElements = entry.motionSelector ? [...visual.querySelectorAll(entry.motionSelector)] : entry.elements;
       entry.elements.forEach((element) => {
         element.classList.add('explainable');
         element.tabIndex = 0;

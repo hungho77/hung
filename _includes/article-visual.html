@@ -22,10 +22,29 @@
       <div class="int8-ladder visual-panel" data-visual-step="2"><small>INT8 GRID</small>{% for i in (1..8) %}<i><b>{{ i }}</b></i>{% endfor %}</div>
       <div class="visual-result" data-visual-step="3"><strong>256</strong><span>representable levels</span><small>Calibration balances clipping error against rounding error.</small></div>
     {% when 'smoothquant' %}
-      <div class="smooth-side visual-panel" data-visual-step="1"><small>ACTIVATIONS · HARD</small><div class="smooth-bars activation-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div><b>OUTLIERS</b></div>
-      <div class="smooth-migration" data-visual-step="2"><span>offline scale</span><i>difficulty →</i></div>
-      <div class="smooth-side visual-panel" data-visual-step="2"><small>WEIGHTS · EASY</small><div class="smooth-bars weight-bars"><i></i><i></i><i></i><i></i><i></i><i></i></div><b>ABSORB RANGE</b></div>
-      <div class="equivalence-chip" data-visual-step="3"><span>Y = (X / s) · (sW)</span><strong>same output</strong></div>
+      <div class="sq-stage sq-before visual-panel" data-visual-step="1">
+        <header><small>BEFORE · X</small><strong>ACTIVATIONS</strong><em>HARD</em></header>
+        <div class="sq-chart sq-before-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <p>One outlier channel stretches the whole INT8 range.</p>
+      </div>
+      <div class="sq-transform" data-visual-step="2">
+        <small>PER-CHANNEL · OFFLINE</small>
+        <strong>X̂ = X · diag(s)⁻¹</strong>
+        <div class="sq-transfer-track" aria-hidden="true"><i></i><span>difficulty</span></div>
+        <strong>Ŵ = diag(s) · W</strong>
+        <code>sⱼ = max|Xⱼ|ᵅ / max|Wⱼ|¹⁻ᵅ</code>
+      </div>
+      <div class="sq-stage sq-after visual-panel" data-visual-step="3">
+        <header><small>AFTER · X̂</small><strong>ACTIVATIONS</strong><em>EASY</em></header>
+        <div class="sq-chart sq-after-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <p>Outlier variance is reduced; INT8 levels cover useful values.</p>
+      </div>
+      <div class="sq-weight-path visual-panel" data-visual-step="2">
+        <div><small>W · BEFORE</small><div class="sq-weight-bars sq-weight-before" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><b>EASY</b></div>
+        <span>scale variance →</span>
+        <div><small>Ŵ · ADJUSTED</small><div class="sq-weight-bars sq-weight-after" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><b>STILL EASY</b></div>
+      </div>
+      <div class="sq-equivalence" data-visual-step="3"><span>Y = XW = X̂Ŵ</span><strong>same output · W8A8-ready</strong><small>s is fused offline; no runtime activation scaling</small></div>
     {% when 'gptq' %}
       <div class="gptq-grid visual-panel" data-visual-step="1"><small>WEIGHT BLOCK</small><div>{% for i in (1..20) %}<i></i>{% endfor %}</div></div>
       <div class="gptq-arrow" data-visual-step="2"><span>quantize one column</span><i>→</i></div>
