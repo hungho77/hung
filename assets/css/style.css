@@ -94,6 +94,10 @@ img { display: block; max-width: 100%; }
   font-weight: 700;
 }
 .hero h1 em { color: var(--blue-400); font-style: normal; }
+html[lang="vi"] .hero h1 {
+  line-height: 1.04;
+  letter-spacing: -.065em;
+}
 .hero-intro { max-width: 650px; margin: 0; color: var(--muted); font-size: 18px; line-height: 1.7; }
 .hero-intro strong { color: var(--white); font-weight: 600; }
 .hero-actions { display: flex; gap: 12px; margin-top: 38px; }
