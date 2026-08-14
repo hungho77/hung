@@ -9,10 +9,10 @@ paper_year: "Production"
 learning_stage: Debugging
 visual_type: debug
 paper_url: "https://github.com/NVIDIA/TensorRT-Edge-LLM/issues/151"
-visual_title: "One symptom can hide four independent failures"
-visual_alt: "Animated TensorRT debugging decision flow branching garbled output into Myelin CASK AWQ and exporter investigations"
-visual_caption: "Controlled experiments change one variable at a time, turning a vague bad-output symptom into isolated compiler, quantization, and export defects."
-visual_steps: ["Reproduce symptom", "Isolate one cause", "Patch and verify"]
+visual_title: "Trace the first wrong tensor, then change one variable"
+visual_alt: "Interactive TensorRT Edge-LLM debugging map showing a bad-output symptom, first-divergence localization, four independent root causes, a controlled materialization test, and verification evidence"
+visual_caption: "A successful build is not numerical proof. Select the chain to see how tensor comparison localized the first divergence, controlled A/B tests separated four causes, and maintainer-confirmed fixes were verified without hiding performance regressions."
+visual_steps: ["Observe the symptom", "Find first divergence", "Classify the cause", "Run one A/B", "Verify the fix"]
 ---
 
 An engine that builds successfully and generates nonsense looks like one bug. In this case it was four independent defects: two TensorRT 10.13 fusion problems, one incorrect AWQ zero-point transformation, and one unsupported InternLM2 checkpoint layout that silently exported random weights.

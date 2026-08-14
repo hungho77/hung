@@ -9,10 +9,10 @@ paper_year: "2024"
 learning_stage: Learned rotation
 visual_type: spin
 paper_url: "https://arxiv.org/abs/2405.16406"
-visual_title: "Rotate the basis before rounding"
-visual_alt: "Animated SpinQuant coordinate rotation transforming an outlier-heavy distribution into a balanced distribution"
-visual_caption: "The full-precision function stays equivalent under an orthogonal rotation, but the rotated coordinates can be far easier to represent with four bits."
-visual_steps: ["See the outliers", "Learn a rotation", "Quantize the basis"]
+visual_title: "Learn a quantization-friendly basis without changing the FP model"
+visual_alt: "Interactive SpinQuant redraw showing outlier redistribution, orthogonal invariance, Cayley optimization, four rotation locations, and the W4A4KV4 target"
+visual_caption: "Following Figures 1–4: rotations redistribute outliers, cancel in full precision, and are learned on the Stiefel manifold; absorbed R1/R2 and online R3/R4 then support the complete W4A4KV4 path."
+visual_steps: ["Redistribute outliers", "Preserve equivalence", "Learn R", "Place R1–R4", "Deploy W4A4KV4"]
 ---
 
 Low-bit quantization is hardest when a few channels carry extreme values. One scale must cover those outliers, leaving the rest of the tensor with a coarse grid. SpinQuant changes the coordinate system before rounding so the same information is distributed more evenly.

@@ -9,10 +9,10 @@ paper_year: "2020"
 learning_stage: Foundation
 visual_type: int8
 paper_url: "https://arxiv.org/abs/2004.09602"
-visual_title: "Calibration chooses what the INT8 grid can see"
-visual_alt: "Animated activation histogram clipped into an eight bit integer ladder"
-visual_caption: "A narrow range clips outliers; a wide range wastes resolution. Calibration finds the operating point between those two errors."
-visual_steps: ["Observe the range", "Choose the grid", "Balance the error"]
+visual_title: "Histogram → range → integer grid → recovery"
+visual_alt: "Interactive INT8 workflow showing calibration histograms, clipping policies, affine mapping, scale granularity, and accuracy recovery"
+visual_caption: "Following the paper’s PTQ workflow: measure representative activations, choose the clipping–resolution trade-off, map to signed INT8, select scale granularity, then escalate only where sensitivity requires it."
+visual_steps: ["Collect a histogram", "Choose a range", "Map to INT8", "Choose scales", "Recover accuracy"]
 ---
 
 INT8 is mature enough to look easy. Pick a range, map floating-point values into 256 levels, and let the accelerator run faster. Most failed deployments happen in the details hidden by that sentence.

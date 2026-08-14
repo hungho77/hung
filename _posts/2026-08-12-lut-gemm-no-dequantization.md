@@ -9,10 +9,10 @@ paper_year: "2022"
 learning_stage: Kernel design
 visual_type: lut
 paper_url: "https://arxiv.org/abs/2206.09557"
-visual_title: "Use packed bits as lookup addresses"
-visual_alt: "Animated LUT GEMM diagram using packed low bit weights as indices into a lookup table before accumulation"
-visual_caption: "Instead of reconstructing every low-bit weight, LUT-GEMM uses its binary code as an address and accumulates precomputed products."
-visual_steps: ["Read packed bits", "Lookup products", "Accumulate directly"]
+visual_title: "Build 2^μ partial sums, then let packed bits choose"
+visual_alt: "Interactive LUT-GEMM redraw showing BCQ bit planes, activation chunks, lookup-table construction, packed-bit addressing, and scaled reduction"
+visual_caption: "Following Figures 2–3: decompose weights into binary planes, precompute every signed sum for a μ-value activation chunk, use packed bits as addresses, then reduce with scales and bias—without rebuilding FP16 weights."
+visual_steps: ["Read BCQ planes", "Chunk activations", "Build the LUT", "Address by bits", "Reduce"]
 ---
 
 Most weight-only quantization follows a compromise: store weights in three or four bits, then unpack and dequantize them inside the matrix kernel before multiplying by FP16 activations.

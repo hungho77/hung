@@ -6,21 +6,31 @@
   <div class="visual-canvas" role="group" aria-label="{{ page.visual_alt }}">
     {% case page.visual_type %}
     {% when 'quant-map' %}
-      <div class="quant-spectrum visual-panel" data-visual-step="1"><small>FLOATING POINT</small><div class="spectrum-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><b>CONTINUOUS VALUES</b></div>
-      <div class="visual-transfer" data-visual-step="2"><span>scale + round</span><i>→</i></div>
-      <div class="quant-grid visual-panel" data-visual-step="2"><small>LOW PRECISION</small><div class="grid-cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><b>DISCRETE LEVELS</b></div>
-      <div class="visual-result" data-visual-step="3"><strong>4×</strong><span>smaller weights</span><small>Only useful when the runtime has the matching kernel.</small></div>
+      <div class="qm-mapping" data-visual-step="1">
+        <div class="qm-real visual-panel"><small>01 · REAL TENSOR x</small><div>{% for i in (1..9) %}<i></i>{% endfor %}</div><b>continuous values</b></div>
+        <div class="qm-operator"><code>xq = round(clip(x / s))</code><span>scale · clip · round</span><i>→</i></div>
+        <div class="qm-codes visual-panel"><small>02 · QUANTIZED CODES xq</small><div>{% for i in (1..16) %}<i></i>{% endfor %}</div><b>finite codebook</b></div>
+      </div>
+      <div class="qm-formats" data-visual-step="2">
+        <div><small>INT8</small><strong>256</strong><span>uniform integer codes</span></div>
+        <div><small>FP8 E4M3</small><strong>8 bit</strong><span>non-uniform floating point</span></div>
+        <div><small>INT4</small><strong>16</strong><span>weight-only · block 64/128</span></div>
+        <div><small>NVFP4</small><strong>E2M1</strong><span>dynamic · block 16</span></div>
+      </div>
+      <div class="qm-contract visual-panel" data-visual-step="3"><span>FP tensor</span><i>Q</i><b>low-precision tensor + scale</b><i>DQ</i><span>compute input</span></div>
+      <div class="qm-kernel-gate" data-visual-step="4"><small>04 · DEPLOYMENT GATE</small><div><span>packed storage</span><i>+</i><span>supported operator</span><i>+</i><span>native kernel</span></div><strong>MEASURED LATENCY ↓</strong></div>
     {% when 'attention' %}
-      <div class="token-stream" data-visual-step="1"><i>t₁</i><i>t₂</i><i>t₃</i><i>t₄</i></div>
-      <div class="qkv-stack" data-visual-step="1"><span>Q<small>query</small></span><span>K<small>key</small></span><span>V<small>value</small></span></div>
-      <div class="attention-matrix visual-panel" data-visual-step="2"><small>ATTENTION SCORE</small><div class="matrix-cells">{% for i in (1..16) %}<i></i>{% endfor %}</div></div>
-      <div class="visual-transfer attention-transfer" data-visual-step="2"><span>weighted context</span><i>→</i></div>
-      <div class="context-token" data-visual-step="3"><b>z₄</b><small>context-aware token</small></div>
+      <div class="attn-projections visual-panel" data-visual-step="1"><small>01 · LEARNED PROJECTIONS</small><div class="attn-token-row"><b>x₁</b><b>x₂</b><b>x₃</b><b>x₄</b></div><div class="attn-qkv-row"><span>Q = XWQ</span><span>K = XWK</span><span>V = XWV</span></div></div>
+      <div class="attn-score visual-panel" data-visual-step="2"><header><small>02 · SCALED SCORES</small><strong>QKᵀ / √dk</strong></header><div class="attn-score-grid">{% for i in (1..16) %}<i></i>{% endfor %}</div><span>future positions → −∞</span></div>
+      <div class="attn-softmax" data-visual-step="3"><small>03 · ROW SOFTMAX</small><div><i style="--p:12%"></i><i style="--p:21%"></i><i style="--p:18%"></i><i style="--p:49%"></i></div><strong>Σ p = 1</strong></div>
+      <div class="attn-value-mix visual-panel" data-visual-step="4"><small>04 · WEIGHTED VALUES</small><code>z = Σ pᵢvᵢ</code><div><span>p₁V₁</span><span>p₂V₂</span><span>p₃V₃</span><span>p₄V₄</span></div></div>
+      <div class="attn-heads" data-visual-step="5"><div><i>h₁</i><i>h₂</i><i>h₃</i><i>h₄</i></div><span>concat</span><strong>MultiHead(Q,K,V) · WO</strong></div>
     {% when 'int8' %}
-      <div class="range-chart visual-panel" data-visual-step="1"><small>CALIBRATION DISTRIBUTION</small><div class="range-bars">{% for i in (1..15) %}<i></i>{% endfor %}</div><span class="clip-line clip-left">CLIP</span><span class="clip-line clip-right">CLIP</span></div>
-      <div class="visual-transfer" data-visual-step="2"><span>choose range</span><i>→</i></div>
-      <div class="int8-ladder visual-panel" data-visual-step="2"><small>INT8 GRID</small>{% for i in (1..8) %}<i><b>{{ i }}</b></i>{% endfor %}</div>
-      <div class="visual-result" data-visual-step="3"><strong>256</strong><span>representable levels</span><small>Calibration balances clipping error against rounding error.</small></div>
+      <div class="i8-histogram visual-panel" data-visual-step="1"><header><small>01 · CALIBRATION HISTOGRAM</small><strong>activation samples</strong></header><div class="i8-bars">{% for i in (1..21) %}<i></i>{% endfor %}</div><span class="i8-threshold i8-percentile">P99.99</span><span class="i8-threshold i8-max">MAX</span></div>
+      <div class="i8-range-choice" data-visual-step="2"><div><small>MAX</small><b>no clipping</b><span>coarse steps</span></div><div class="is-chosen"><small>ENTROPY / PERCENTILE</small><b>controlled clipping</b><span>finer common values</span></div></div>
+      <div class="i8-affine visual-panel" data-visual-step="3"><small>03 · RANGE MAPPING</small><code>xq = clip(round(sx + z), −128, 127)</code><div class="i8-code-line">{% for i in (1..11) %}<i></i>{% endfor %}</div><span>dequantize: x̂ = (xq − z) / s</span></div>
+      <div class="i8-granularity" data-visual-step="4"><small>04 · GRANULARITY</small><div><span>one tensor</span><b>s</b></div><i>→</i><div class="i8-channel-scales"><span>per channel</span><b>s₁</b><b>s₂</b><b>s₃</b><b>s₄</b></div></div>
+      <div class="i8-recovery" data-visual-step="5"><small>05 · RECOMMENDED WORKFLOW</small><span>PTQ calibration</span><i>→</i><span>sensitivity analysis</span><i>→</i><span>partial INT8</span><i>→</i><span>QAT if needed</span></div>
     {% when 'smoothquant' %}
       <div class="sq-stage sq-before visual-panel" data-visual-step="1">
         <header><small>BEFORE · X</small><strong>ACTIVATIONS</strong><em>HARD</em></header>
@@ -132,30 +142,35 @@
         <b>no mixed precision</b>
       </div>
     {% when 'lut' %}
-      <div class="bit-packets visual-panel" data-visual-step="1"><small>PACKED WEIGHTS</small><span>101</span><span>011</span><span>110</span><span>001</span></div>
-      <div class="visual-transfer" data-visual-step="2"><span>use bits as address</span><i>→</i></div>
-      <div class="lookup-table visual-panel" data-visual-step="2"><small>LOOKUP TABLE</small>{% for i in (0..7) %}<i><span>{{ i }}</span><b>v{{ i }}</b></i>{% endfor %}</div>
-      <div class="visual-transfer" data-visual-step="3"><span>accumulate</span><i>→</i></div>
-      <div class="lut-output" data-visual-step="3"><b>Σ LUT[idx]</b><span>no weight reconstruction</span></div>
+      <div class="lut-bcq visual-panel" data-visual-step="1"><small>01 · EXTENDED BCQ WEIGHTS</small><code>Ŵ = α₀B₀ + α₁B₁ + … + z</code><div><span><b>α₀</b><i>1011</i></span><span><b>α₁</b><i>0110</i></span><span><b>bias</b><i>z</i></span></div></div>
+      <div class="lut-activation visual-panel" data-visual-step="2"><small>02 · ACTIVATION SUBVECTOR · μ=4</small><div><b>x₀</b><b>x₁</b><b>x₂</b><b>x₃</b></div><span>build every signed partial sum once</span></div>
+      <div class="lut-build" data-visual-step="3"><small>03 · 2μ-ENTRY TABLE</small><div>{% for i in (0..15) %}<span><b>{{ i }}</b><i>L{{ i }}</i></span>{% endfor %}</div></div>
+      <div class="lut-address visual-panel" data-visual-step="4"><small>04 · PACKED BITS ARE KEYS</small><div><span><b>1011</b><i>→ L11</i></span><span><b>0110</b><i>→ L6</i></span><span><b>1101</b><i>→ L13</i></span></div><p>No FP16 weight vector is reconstructed.</p></div>
+      <div class="lut-reduce" data-visual-step="5"><span>retrieve</span><i>→</i><span>Σ partial sums</span><i>→</i><span>× α + bias</span><strong>y = Ŵx</strong></div>
     {% when 'spin' %}
-      <div class="rotation-space before visual-panel" data-visual-step="1"><small>BEFORE · OUTLIERS</small><div class="axis-x"></div><div class="axis-y"></div>{% for i in (1..12) %}<i></i>{% endfor %}</div>
-      <div class="rotation-operator" data-visual-step="2"><span>R</span><i>↻</i><small>learned rotation</small></div>
-      <div class="rotation-space after visual-panel" data-visual-step="3"><small>AFTER · BALANCED</small><div class="axis-x"></div><div class="axis-y"></div>{% for i in (1..12) %}<i></i>{% endfor %}</div>
-      <p class="visual-callout" data-visual-step="3">Same full-precision function. A basis that survives W4A4KV4.</p>
+      <div class="spin-distributions" data-visual-step="1"><div class="spin-dist spin-before visual-panel"><small>01 · BEFORE ROTATION</small><div>{% for i in (1..12) %}<i></i>{% endfor %}</div><span>channel outliers · high kurtosis</span></div><i>R</i><div class="spin-dist spin-after visual-panel"><small>AFTER ROTATION</small><div>{% for i in (1..12) %}<i></i>{% endfor %}</div><span>energy spread across coordinates</span></div></div>
+      <div class="spin-equivalence visual-panel" data-visual-step="2"><small>02 · ROTATIONAL INVARIANCE</small><div><span>X</span><i>R</i><b>rotated residual</b><i>Rᵀ</i><span>block input</span></div><code>RᵀR = I · full-precision function unchanged</code></div>
+      <div class="spin-search" data-visual-step="3"><small>03 · RANDOM IS NOT ENOUGH</small><div class="spin-trials">{% for i in (1..10) %}<i></i>{% endfor %}<b>13-point spread</b></div><span>Cayley SGD searches R on the Stiefel manifold</span><strong>R* = arg min LQ(R)</strong></div>
+      <div class="spin-locations" data-visual-step="4"><small>04 · FIGURE 1 ROTATION MAP</small><div><span><b>R1</b> residual</span><span><b>R2</b> V ↔ O</span><span><b>R3</b> KV Hadamard</span><span><b>R4</b> FFN Hadamard</span></div><p><i>R1/R2</i> absorbed into weights · <i>R3/R4</i> remain fast online transforms</p></div>
+      <div class="spin-result" data-visual-step="5"><small>05 · TARGET</small><strong>W4A4KV4</strong><span>learn the basis first · quantize second</span></div>
     {% when 'paro' %}
-      <div class="pair-bank visual-panel" data-visual-step="1"><small>CHANNEL PAIRS</small><span>x₁ · x₂</span><span>x₃ · x₄</span><span>x₅ · x₆</span><span>x₇ · x₈</span></div>
-      <div class="pair-rotations" data-visual-step="2"><i>G(θ₁)</i><i>G(θ₂)</i><i>G(θ₃)</i><i>G(θ₄)</i></div>
-      <div class="int4-lanes visual-panel" data-visual-step="3"><small>GPU-FRIENDLY INT4 LANES</small><span></span><span></span><span></span><span></span></div>
-      <div class="visual-result" data-visual-step="3"><strong>2×2</strong><span>independent rotations</span><small>Enough flexibility to tame local outliers; enough structure to deploy.</small></div>
+      <div class="paro-balance visual-panel" data-visual-step="1"><small>01 · CHANNEL-WISE SCALE</small><div class="paro-range-before">{% for i in (1..8) %}<i></i>{% endfor %}</div><span>uneven channel ranges</span><div class="paro-range-after">{% for i in (1..8) %}<i></i>{% endfor %}</div><strong>diag(α) equalizes magnitude</strong></div>
+      <div class="paro-pairs visual-panel" data-visual-step="2"><small>02 · ONE INDEPENDENT ROTATION</small><div><span><b>c1</b><i>↔</i><b>c6</b></span><span><b>c2</b><i>↔</i><b>c8</b></span><span><b>c3</b><i>↔</i><b>c5</b></span><span><b>c4</b><i>↔</i><b>c7</b></span></div><p>Each channel appears once → every pair runs in parallel.</p></div>
+      <div class="paro-givens" data-visual-step="3"><small>03 · 2×2 GIVENS UPDATE</small><div><code>w′ᵢ = cosθ·wᵢ − sinθ·wⱼ</code><code>w′ⱼ = sinθ·wᵢ + cosθ·wⱼ</code></div><span>align values inside each pair · preserve pair norm</span></div>
+      <div class="paro-series visual-panel" data-visual-step="4"><small>04 · RESTORE EXPRESSIVENESS</small><div>{% for i in (1..8) %}<span>R{{ i }}</span>{% endfor %}</div><code>T(W) = (Π Rk) · diag(α) · W</code><p>Several independent stages mix different disjoint pairs.</p></div>
+      <div class="paro-kernel" data-visual-step="5"><small>05 · FUSED RUNTIME</small><div><span>token parallel</span><span>group parallel</span><span>pair parallel</span></div><i>→</i><strong>ROTATE + INT4 GEMM</strong></div>
     {% when 'vla' %}
-      <div class="vla-pipeline" data-visual-step="1"><div><i class="camera-eye"></i><span>CAMERA</span><small>pixels</small></div><b>→</b><div><i class="vision-grid"></i><span>VISION</span><small>tokens</small></div><b>→</b><div><i class="language-lines"></i><span>VLM</span><small>reasoning</small></div><b>→</b><div><i class="action-pulse"></i><span>ACTION</span><small>controls</small></div></div>
-      <div class="bottleneck-meter visual-panel" data-visual-step="2"><small>BOTTLENECK MOVES WITH THE WORKLOAD</small><span><i>VISION</i><b style="--meter:42%"></b></span><span><i>LANGUAGE</i><b style="--meter:88%"></b></span><span><i>ACTION</i><b style="--meter:31%"></b></span></div>
-      <p class="visual-callout" data-visual-step="3">Optimize the slow stage—not the most fashionable operator.</p>
+      <div class="vperf-timeline visual-panel" data-visual-step="1"><small>01 · SYNCHRONOUS CONTROL LOOP · FIGURE 2</small><div class="vperf-lane"><span>camera frame</span><b class="vp-vision">vision</b><b class="vp-vlm">VLM</b><b class="vp-action">action expert</b><i>execute horizon</i></div><div class="vperf-deadline"><span>next camera frame</span><strong>latency must fit the control budget</strong></div></div>
+      <div class="vperf-roofline" data-visual-step="2"><small>02 · OPERATOR ROOFLINE</small><div><span><b>compute</b><i>FLOPs / peak FLOPs</i></span><span><b>memory</b><i>bytes / bandwidth</i></span><span><b>network</b><i>latency + bytes / BW</i></span></div><code>To = max(Tcompute, Tmemory) + Tnetwork</code></div>
+      <div class="vperf-breakdown visual-panel" data-visual-step="3"><small>03 · COMPONENT BREAKDOWN</small><div><span><b>VISION</b><i style="--w:72%"></i><em>many image tokens</em></span><span><b>VLM</b><i style="--w:88%"></i><em>backbone + context</em></span><span><b>ACTION</b><i style="--w:46%"></i><em>iterative prediction</em></span></div><p>The limiting resource changes with hardware and model shape.</p></div>
+      <div class="vperf-knobs" data-visual-step="4"><small>04 · FIGURE 6 DESIGN KNOBS</small><div><span><b>denoising steps</b><i>10 → 50</i><strong>5× action latency</strong></span><span><b>action chunk</b><i>50 → 250</i><strong>+40% action latency</strong></span></div><p>Repeated model passes cost more than adding tokens to a memory-bound action expert.</p></div>
+      <div class="vperf-async" data-visual-step="5"><small>05 · OVERLAP, WITH A COST</small><div><span>upload / infer</span><i></i><span>execute previous chunk</span></div><strong>throughput ↑ · observation staleness ↑</strong></div>
     {% when 'debug' %}
-      <div class="debug-graph visual-panel" data-visual-step="1"><small>ONE SYMPTOM</small><strong>garbled tokens</strong><span>ENGINE BUILDS ✓</span></div>
-      <div class="debug-branches" data-visual-step="2"><i>MYELIN</i><i>CASK</i><i>AWQ</i><i>EXPORT</i></div>
-      <div class="debug-probes" data-visual-step="2"><span>disable fusion</span><span>trace zeros</span><span>compare weights</span><span>validate logits</span></div>
-      <div class="debug-output" data-visual-step="3"><span>ISOLATE</span><b>→</b><span>PATCH</span><b>→</b><span>VERIFY</span><strong>clean output ✓</strong></div>
+      <div class="dbg-symptom visual-panel" data-visual-step="1"><small>01 · SAME VISIBLE SYMPTOM</small><strong>ENGINE BUILDS ✓</strong><span>generation is nonsense</span><code>Do not diagnose from the final tokens.</code></div>
+      <div class="dbg-first-divergence" data-visual-step="2"><small>02 · TRACE THE FIRST WRONG TENSOR</small><div><span>PyTorch reference</span><i>↔</i><span>ONNX export</span><i>↔</i><span>TensorRT layer</span><i>↔</i><span>KV cache / logits</span></div><strong>stop at the earliest cosine collapse</strong></div>
+      <div class="dbg-cases" data-visual-step="3"><small>03 · FOUR INDEPENDENT ROOT CAUSES</small><div><span><b>FP16</b><i>Myelin fc_h fusion</i></span><span><b>NVFP4</b><i>CASK ≥2 epilogues</i></span><span><b>INT4 AWQ</b><i>lossy zero-point fold</i></span><span><b>InternVL3</b><i>unmatched checkpoint keys</i></span></div></div>
+      <div class="dbg-ab" data-visual-step="4"><small>04 · CHANGE ONE VARIABLE</small><div><span>same graph</span><span>same weights</span><span>same prompt</span><b>one compiler / representation decision</b></div><code>V hidden: cos ≈ .015 → expose V: cos ≈ 1.0</code></div>
+      <div class="dbg-proof visual-panel" data-visual-step="5"><small>05 · VERIFY THE FIX</small><div><span>tensor agreement</span><span>correct generation</span><span>latency retained</span><span>maintainer confirmation</span></div><strong>PATCH ONLY AFTER CAUSAL EVIDENCE</strong></div>
     {% endcase %}
   </div>
   <aside class="visual-inspector" data-visual-inspector aria-live="polite">

@@ -9,10 +9,10 @@ paper_year: "Applied"
 learning_stage: System design
 visual_type: vla
 paper_url: "https://arxiv.org/abs/2602.18397"
-visual_title: "A VLA is a pipeline, not one workload"
-visual_alt: "Animated VLA architecture from camera through vision encoder and language backbone to action controls with moving bottlenecks"
-visual_caption: "Vision, language, and action stages stress different resources. The useful optimization target is whichever stage owns end-to-end latency on the deployment hardware."
-visual_steps: ["Trace the pipeline", "Measure each stage", "Fix the bottleneck"]
+visual_title: "Model the control timeline—not one generic pipeline"
+visual_alt: "Interactive VLA-Perf redraw showing the synchronous control timeline, roofline bounds, component latency, action-expert knobs, and asynchronous overlap"
+visual_caption: "Following Figures 2 and 6: fit the full control loop into camera cadence, model each operator’s limiting resource, separate component latency, and distinguish throughput overlap from end-to-end response time."
+visual_steps: ["Trace the control loop", "Apply roofline bounds", "Find the owner", "Compare action knobs", "Evaluate overlap"]
 ---
 
 A Vision-Language-Action model is not one workload. It is a pipeline: a vision encoder turns camera frames into tokens, a language backbone reasons over the observation and instruction, and an action expert turns that context into controls. Each stage can hit a different hardware limit.

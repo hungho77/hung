@@ -9,10 +9,10 @@ paper_year: "2025"
 learning_stage: Efficient rotation
 visual_type: paro
 paper_url: "https://arxiv.org/abs/2511.10645"
-visual_title: "Rotate independent channel pairs"
-visual_alt: "Animated ParoQuant diagram applying small Givens rotations to channel pairs before packing them into INT4 lanes"
-visual_caption: "ParoQuant replaces a dense rotation with independent 2×2 Givens transforms, preserving useful flexibility while remaining practical for a GPU kernel."
-visual_steps: ["Pair channels", "Apply Givens", "Pack INT4 lanes"]
+visual_title: "Scale channels, rotate disjoint pairs, fuse the runtime"
+visual_alt: "Interactive ParoQuant redraw showing channel balancing, independent pairs, Givens equations, staged rotations, and fused CUDA execution"
+visual_caption: "Following Figures 1 and 3: channel scaling controls global ranges, disjoint Givens pairs align local values, repeated stages recover expressiveness, and the fused kernel parallelizes tokens, groups, and pairs."
+visual_steps: ["Balance channels", "Choose pairs", "Apply Givens", "Stack stages", "Fuse execution"]
 ---
 
 Rotation-based quantization improves accuracy by spreading outliers across channels. The deployment problem is that a dense learned rotation can cost enough to erase the latency saved by INT4.

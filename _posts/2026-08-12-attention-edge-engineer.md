@@ -9,10 +9,10 @@ paper_year: "2017"
 learning_stage: Foundation
 visual_type: attention
 paper_url: "https://arxiv.org/abs/1706.03762"
-visual_title: "A token gathers context through Q, K, and V"
-visual_alt: "Animated attention flow from input tokens through query key value projections and an attention matrix to a context token"
-visual_caption: "Queries choose what to retrieve, keys describe what each token offers, and values carry the information combined into the output context."
-visual_steps: ["Project Q · K · V", "Score relationships", "Mix the context"]
+visual_title: "Scaled dot-product attention, then multi-head"
+visual_alt: "Interactive redraw of Transformer Figure 2 showing Q K V projections, scaled masked scores, row softmax, weighted value mixing, and multi-head concatenation"
+visual_caption: "Following Figure 2 and Equation 1: project Q/K/V, scale and mask QKᵀ, normalize each row, mix V, then concatenate independent heads through Wᴼ."
+visual_steps: ["Project Q · K · V", "Scale and mask scores", "Normalize", "Mix values", "Join heads"]
 ---
 
 The most important systems consequence of *Attention Is All You Need* is not that recurrence disappeared. It is that sequence modeling became dominated by matrix operations that accelerators can parallelize—until autoregressive inference puts a sequential loop back around the model.
