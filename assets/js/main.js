@@ -134,6 +134,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (description) description.textContent = entry.description;
       if (impact) impact.textContent = entry.impact;
       if (status) status.textContent = `Selected ${String(index + 1).padStart(2, '0')} / ${String(entries.length).padStart(2, '0')} · ${entry.title}`;
+      const inspectorBounds = inspector?.getBoundingClientRect();
+      if (inspectorBounds && (inspectorBounds.bottom > window.innerHeight - 16 || inspectorBounds.top < 16)) {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        inspector.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+      }
       visual.explainTimer = window.setTimeout(() => {
         entry.elements.forEach((element) => element.classList.remove('is-explaining'));
       }, 2800);
