@@ -12,8 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
   } catch (_) { /* Preference storage is optional. */ }
 
   document.querySelectorAll('[data-language-choice]').forEach((link) => {
-    link.addEventListener('click', () => {
+    const rememberLanguage = () => {
       try { window.localStorage.setItem('portfolio-language', link.dataset.languageChoice); } catch (_) { /* Preference storage is optional. */ }
+    };
+    link.addEventListener('click', rememberLanguage);
+    link.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') rememberLanguage();
     });
   });
 

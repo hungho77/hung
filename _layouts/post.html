@@ -38,7 +38,7 @@ layout: default
   {% endfor %}
   <nav class="learning-next" aria-label="{% if post_is_vi %}Tiếp tục lộ trình đọc{% else %}Continue the learning path{% endif %}">
     {% if next_note %}
-    <a href="{{ next_note.url | relative_url }}?v=20260813-1">
+    <a href="{{ next_note.url | relative_url }}">
       <span>{% if post_is_vi %}Đọc tiếp · Bước{% else %}Continue learning · Step{% endif %} {{ next_note.learning_order }}</span>
       <strong>{{ next_note.title }}</strong>
       <i>{% if post_is_vi %}Bài tiếp theo{% else %}Next note{% endif %} →</i>
