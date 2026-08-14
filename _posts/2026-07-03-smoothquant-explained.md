@@ -8,6 +8,7 @@ learning_order: 4
 paper_year: "2022"
 learning_stage: Activation quantization
 visual_type: smoothquant
+paper_url: "https://arxiv.org/abs/2211.10438"
 visual_title: "Move quantization difficulty offline"
 visual_alt: "Animated SmoothQuant diagram moving activation outlier range into the weights while preserving the output"
 visual_caption: "SmoothQuant divides activations by a per-channel scale and multiplies weights by the same scale, preserving the product while making activations easier to quantize."

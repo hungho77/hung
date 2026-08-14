@@ -8,6 +8,7 @@ learning_order: 2
 paper_year: "2017"
 learning_stage: Foundation
 visual_type: attention
+paper_url: "https://arxiv.org/abs/1706.03762"
 visual_title: "A token gathers context through Q, K, and V"
 visual_alt: "Animated attention flow from input tokens through query key value projections and an attention matrix to a context token"
 visual_caption: "Queries choose what to retrieve, keys describe what each token offers, and values carry the information combined into the output context."

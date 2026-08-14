@@ -29,33 +29,90 @@ document.addEventListener('DOMContentLoaded', () => {
     const label = button?.querySelector('span');
     const canvas = visual.querySelector('.visual-canvas');
     const phaseButtons = [...visual.querySelectorAll('[data-visual-phase]')];
+    const visualGroups = [...visual.querySelectorAll('[data-visual-step]')];
+    const status = visual.querySelector('[data-visual-status]');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const setToggle = (playing, mode = 'overview') => {
+      button?.setAttribute('aria-pressed', String(playing));
+      button?.setAttribute('aria-label', playing ? `Pause the ${mode} animation` : 'Play the complete concept animation');
+      if (label) label.textContent = playing ? 'Pause motion' : 'Play overview';
+    };
+
+    const resetGroups = () => {
+      visualGroups.forEach((group) => {
+        group.style.removeProperty('opacity');
+        group.style.removeProperty('filter');
+      });
+    };
+
+    const selectPhase = (phaseButton) => {
+      const phase = phaseButton.dataset.visualPhase;
+      phaseButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === phaseButton)));
+
+      if (phase === 'all') {
+        canvas?.removeAttribute('data-phase');
+        visual.classList.remove('is-phase-playing');
+        visual.classList.add('is-paused');
+        resetGroups();
+        setToggle(false);
+        if (status) status.textContent = 'Static overview · choose a block to animate';
+        return;
+      }
+
+      canvas?.setAttribute('data-phase', phase);
+      visualGroups.forEach((group) => {
+        const active = group.dataset.visualStep === phase;
+        group.style.setProperty('opacity', active ? '1' : '.16', 'important');
+        group.style.filter = active ? 'none' : 'saturate(.45)';
+      });
+      visual.classList.remove('is-paused', 'is-phase-playing');
+      void visual.offsetWidth;
+      visual.classList.add('is-phase-playing');
+      setToggle(true, 'selected block');
+      const phaseLabel = phaseButton.querySelector('span')?.textContent?.trim() || `block ${phase}`;
+      if (status) status.textContent = reduceMotion ? `Selected 0${phase} · ${phaseLabel}` : `Animating 0${phase} · ${phaseLabel}`;
+    };
+
     button?.addEventListener('click', () => {
-      const paused = visual.classList.toggle('is-paused');
-      button.setAttribute('aria-pressed', String(paused));
-      button.setAttribute('aria-label', paused ? 'Play concept animation' : 'Pause concept animation');
-      if (label) label.textContent = paused ? 'Play motion' : 'Pause motion';
+      const playing = button.getAttribute('aria-pressed') === 'true';
+      if (playing) {
+        visual.classList.add('is-paused');
+        setToggle(false);
+        if (status) status.textContent = 'Motion paused';
+        return;
+      }
+      canvas?.removeAttribute('data-phase');
+      resetGroups();
+      phaseButtons.forEach((item) => item.setAttribute('aria-pressed', String(item.dataset.visualPhase === 'all')));
+      visual.classList.remove('is-paused', 'is-phase-playing');
+      void visual.offsetWidth;
+      setToggle(true);
+      if (status) status.textContent = reduceMotion ? 'Complete concept selected' : 'Playing the complete concept';
     });
     phaseButtons.forEach((phaseButton) => {
-      phaseButton.addEventListener('click', () => {
-        const phase = phaseButton.dataset.visualPhase;
-        const groups = [...visual.querySelectorAll('[data-visual-step]')];
-        if (phase === 'all') {
-          canvas?.removeAttribute('data-phase');
-          groups.forEach((group) => {
-            group.style.removeProperty('opacity');
-            group.style.removeProperty('filter');
-          });
-        } else {
-          canvas?.setAttribute('data-phase', phase);
-          groups.forEach((group) => {
-            const active = group.dataset.visualStep === phase;
-            group.style.setProperty('opacity', active ? '1' : '.16', 'important');
-            group.style.filter = active ? 'none' : 'saturate(.45)';
-          });
-        }
-        phaseButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === phaseButton)));
+      phaseButton.addEventListener('click', () => selectPhase(phaseButton));
+    });
+
+    visualGroups.forEach((group) => {
+      const phase = group.dataset.visualStep;
+      const phaseButton = phaseButtons.find((item) => item.dataset.visualPhase === phase);
+      if (!phaseButton) return;
+      group.tabIndex = 0;
+      group.setAttribute('role', 'button');
+      group.setAttribute('aria-label', `Animate block 0${phase}: ${phaseButton.querySelector('span')?.textContent?.trim() || 'concept step'}`);
+      group.addEventListener('click', () => selectPhase(phaseButton));
+      group.addEventListener('keydown', (event) => {
+        if (!['Enter', ' '].includes(event.key)) return;
+        event.preventDefault();
+        selectPhase(phaseButton);
       });
     });
+
+    visual.selectPhase = (phase) => {
+      const target = phaseButtons.find((item) => item.dataset.visualPhase === String(phase));
+      if (target) selectPhase(target);
+    };
   });
 
   const postPage = document.querySelector('[data-post-page]');
@@ -89,6 +146,59 @@ document.addEventListener('DOMContentLoaded', () => {
       link.textContent = heading.textContent;
       link.setAttribute('aria-label', `Section ${index + 1}: ${heading.textContent}`);
       toc.append(link);
+    });
+
+    const conceptVisual = document.querySelector('[data-article-visual]');
+    const conceptSteps = [...(conceptVisual?.querySelectorAll('[data-visual-phase]:not([data-visual-phase="all"])') || [])];
+    const reduceSectionMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const sectionOutcomes = ['Input and evidence', 'Mechanism and transformation', 'Deployment consequence'];
+    headings.forEach((heading, index) => {
+      const phase = Math.min(3, Math.floor((index * 3) / Math.max(1, headings.length)) + 1);
+      const nextParagraph = [...postContent.children].slice([...postContent.children].indexOf(heading) + 1).find((element) => element.tagName === 'P');
+      const rawSummary = nextParagraph?.textContent?.replace(/\s+/g, ' ').trim() || 'Use the motion to connect this section to the article’s main concept.';
+      const summary = rawSummary.length > 150 ? `${rawSummary.slice(0, 147).trim()}…` : rawSummary;
+      const mappedStep = conceptSteps[phase - 1]?.querySelector('span')?.textContent?.trim() || `Concept block ${phase}`;
+      const motion = document.createElement('aside');
+      motion.className = 'section-motion article-reveal';
+      motion.dataset.sectionMotion = String(phase);
+      motion.setAttribute('aria-label', `Interactive explanation for ${heading.textContent}`);
+
+      const kicker = document.createElement('span');
+      kicker.className = 'section-motion-kicker';
+      kicker.textContent = `SECTION MOTION · 0${phase}`;
+      const flow = document.createElement('div');
+      flow.className = 'section-motion-flow';
+      [heading.textContent, mappedStep, sectionOutcomes[phase - 1]].forEach((text, nodeIndex) => {
+        const node = document.createElement('span');
+        node.className = 'section-motion-node';
+        node.dataset.node = String(nodeIndex + 1);
+        node.textContent = text;
+        flow.append(node);
+        if (nodeIndex < 2) {
+          const connector = document.createElement('i');
+          connector.setAttribute('aria-hidden', 'true');
+          connector.textContent = '→';
+          flow.append(connector);
+        }
+      });
+      const footer = document.createElement('div');
+      footer.className = 'section-motion-footer';
+      const note = document.createElement('p');
+      note.textContent = summary;
+      const replay = document.createElement('button');
+      replay.type = 'button';
+      replay.textContent = reduceSectionMotion ? 'Select block' : 'Animate section';
+      replay.setAttribute('aria-label', `Animate the explanation for ${heading.textContent}`);
+      replay.addEventListener('click', () => {
+        motion.classList.remove('is-playing');
+        void motion.offsetWidth;
+        motion.classList.add('is-playing');
+        conceptVisual?.selectPhase?.(phase);
+        replay.textContent = reduceSectionMotion ? 'Selected' : 'Replay motion';
+      });
+      footer.append(note, replay);
+      motion.append(kicker, flow, footer);
+      heading.insertAdjacentElement('afterend', motion);
     });
 
     postContent.querySelectorAll('table').forEach((table) => {

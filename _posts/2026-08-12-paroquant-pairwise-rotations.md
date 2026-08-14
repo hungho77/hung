@@ -8,6 +8,7 @@ learning_order: 9
 paper_year: "2025"
 learning_stage: Efficient rotation
 visual_type: paro
+paper_url: "https://arxiv.org/abs/2511.10645"
 visual_title: "Rotate independent channel pairs"
 visual_alt: "Animated ParoQuant diagram applying small Givens rotations to channel pairs before packing them into INT4 lanes"
 visual_caption: "ParoQuant replaces a dense rotation with independent 2×2 Givens transforms, preserving useful flexibility while remaining practical for a GPU kernel."

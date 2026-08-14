@@ -8,6 +8,7 @@ learning_order: 10
 paper_year: "Applied"
 learning_stage: System design
 visual_type: vla
+paper_url: "https://arxiv.org/abs/2602.18397"
 visual_title: "A VLA is a pipeline, not one workload"
 visual_alt: "Animated VLA architecture from camera through vision encoder and language backbone to action controls with moving bottlenecks"
 visual_caption: "Vision, language, and action stages stress different resources. The useful optimization target is whichever stage owns end-to-end latency on the deployment hardware."

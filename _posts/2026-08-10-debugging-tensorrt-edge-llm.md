@@ -8,6 +8,7 @@ learning_order: 11
 paper_year: "Production"
 learning_stage: Debugging
 visual_type: debug
+paper_url: "https://github.com/NVIDIA/TensorRT-Edge-LLM/issues/151"
 visual_title: "One symptom can hide four independent failures"
 visual_alt: "Animated TensorRT debugging decision flow branching garbled output into Myelin CASK AWQ and exporter investigations"
 visual_caption: "Controlled experiments change one variable at a time, turning a vague bad-output symptom into isolated compiler, quantization, and export defects."

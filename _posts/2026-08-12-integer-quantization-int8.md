@@ -8,6 +8,7 @@ learning_order: 3
 paper_year: "2020"
 learning_stage: Foundation
 visual_type: int8
+paper_url: "https://arxiv.org/abs/2004.09602"
 visual_title: "Calibration chooses what the INT8 grid can see"
 visual_alt: "Animated activation histogram clipped into an eight bit integer ladder"
 visual_caption: "A narrow range clips outliers; a wide range wastes resolution. Calibration finds the operating point between those two errors."

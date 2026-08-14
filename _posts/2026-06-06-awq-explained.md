@@ -8,6 +8,7 @@ learning_order: 6
 paper_year: "2023"
 learning_stage: Salience aware
 visual_type: awq
+paper_url: "https://arxiv.org/abs/2306.00978"
 visual_title: "Let activations reveal the sensitive channels"
 visual_alt: "Animated AWQ diagram using activation magnitude to identify and protect salient weight channels"
 visual_caption: "AWQ observes activation statistics, protects a small set of salient channels through scaling, and quantizes the remaining weights aggressively."

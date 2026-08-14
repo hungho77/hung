@@ -8,6 +8,7 @@ learning_order: 5
 paper_year: "2022"
 learning_stage: Weight quantization
 visual_type: gptq
+paper_url: "https://arxiv.org/abs/2210.17323"
 visual_title: "Quantize, then compensate the remaining weights"
 visual_alt: "Animated GPTQ block diagram showing sequential weight quantization and Hessian guided error compensation"
 visual_caption: "GPTQ uses approximate second-order information to push each local quantization error into weights that have not yet been quantized."

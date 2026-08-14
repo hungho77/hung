@@ -8,6 +8,7 @@ learning_order: 7
 paper_year: "2022"
 learning_stage: Kernel design
 visual_type: lut
+paper_url: "https://arxiv.org/abs/2206.09557"
 visual_title: "Use packed bits as lookup addresses"
 visual_alt: "Animated LUT GEMM diagram using packed low bit weights as indices into a lookup table before accumulation"
 visual_caption: "Instead of reconstructing every low-bit weight, LUT-GEMM uses its binary code as an address and accumulates precomputed products."

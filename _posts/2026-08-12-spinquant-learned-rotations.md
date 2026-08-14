@@ -8,6 +8,7 @@ learning_order: 8
 paper_year: "2024"
 learning_stage: Learned rotation
 visual_type: spin
+paper_url: "https://arxiv.org/abs/2405.16406"
 visual_title: "Rotate the basis before rounding"
 visual_alt: "Animated SpinQuant coordinate rotation transforming an outlier-heavy distribution into a balanced distribution"
 visual_caption: "The full-precision function stays equivalent under an orthogonal rotation, but the rotated coordinates can be far easier to represent with four bits."

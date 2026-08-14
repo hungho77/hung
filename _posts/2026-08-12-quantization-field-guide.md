@@ -8,6 +8,7 @@ learning_order: 1
 paper_year: "Start here"
 learning_stage: Orientation
 visual_type: quant-map
+paper_url: "https://docs.nvidia.com/deeplearning/tensorrt/latest/inference-library/work-quantized-types.html"
 visual_title: "From continuous values to a hardware representation"
 visual_alt: "Animated diagram mapping floating point values onto a smaller discrete quantization grid"
 visual_caption: "Quantization maps a wide continuous range onto fewer levels. Compression only becomes speed when the target runtime executes that representation directly."
