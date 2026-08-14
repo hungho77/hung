@@ -3,6 +3,8 @@ title: "ParoQuant: pairwise rotations that survive deployment"
 subtitle: "From learned Givens rotations to an INT4 TensorRT pipeline—and what my reduced-calibration experiment actually showed."
 date: 2026-08-12 16:00:00 +0700
 permalink: /blog/paroquant-pairwise-rotations/
+lang: en
+translation_url: /vi/blog/paroquant-pairwise-rotations/
 tags: [ParoQuant, TensorRT, Experiment]
 learning_order: 9
 paper_year: "2025"

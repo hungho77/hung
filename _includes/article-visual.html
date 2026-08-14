@@ -1,7 +1,7 @@
 <figure id="concept-visual" class="article-visual visual-{{ page.visual_type }}" data-article-visual data-visual-kind="{{ page.visual_type }}">
   <header class="visual-header">
     <div><span>CONCEPT VISUAL · {{ page.paper_year }}</span><strong>{{ page.visual_title }}</strong></div>
-    <span class="visual-mode"><i aria-hidden="true"></i> Select a component</span>
+    <span class="visual-mode"><i aria-hidden="true"></i> {% if page.lang == 'vi' %}Chọn một thành phần{% else %}Select a component{% endif %}</span>
   </header>
   <div class="visual-canvas" role="group" aria-label="{{ page.visual_alt }}">
     {% case page.visual_type %}
@@ -174,20 +174,20 @@
     {% endcase %}
   </div>
   <aside class="visual-inspector" data-visual-inspector aria-live="polite">
-    <button class="visual-inspector-close" type="button" data-inspector-close aria-label="Close explanation">×</button>
+    <button class="visual-inspector-close" type="button" data-inspector-close aria-label="{% if page.lang == 'vi' %}Đóng giải thích{% else %}Close explanation{% endif %}">×</button>
     <div class="visual-inspector-main">
-      <span data-inspector-kicker>HOW TO EXPLORE</span>
-      <h3 data-inspector-title>Select any outlined component</h3>
+      <span data-inspector-kicker>{% if page.lang == 'vi' %}CÁCH KHÁM PHÁ{% else %}HOW TO EXPLORE{% endif %}</span>
+      <h3 data-inspector-title>{% if page.lang == 'vi' %}Chọn một thành phần có viền{% else %}Select any outlined component{% endif %}</h3>
       <p data-inspector-description>{{ page.visual_caption }}</p>
     </div>
     <div class="visual-inspector-impact">
-      <span>WHY IT MATTERS</span>
-      <p data-inspector-impact>The visual stays still until you choose a component. Motion is used once to reveal that component’s role in the system.</p>
+      <span>{% if page.lang == 'vi' %}VÌ SAO QUAN TRỌNG{% else %}WHY IT MATTERS{% endif %}</span>
+      <p data-inspector-impact>{% if page.lang == 'vi' %}Hình minh họa đứng yên cho đến khi bạn chọn một thành phần. Motion chỉ chạy một lần để làm rõ vai trò của thành phần đó trong hệ thống.{% else %}The visual stays still until you choose a component. Motion is used once to reveal that component’s role in the system.{% endif %}</p>
     </div>
   </aside>
   <div class="visual-status">
-    <span data-visual-status>No component selected</span>
-    {% if page.paper_url %}<a href="{{ page.paper_url }}">Interactive redraw · original source ↗</a>{% endif %}
+    <span data-visual-status>{% if page.lang == 'vi' %}Chưa chọn thành phần{% else %}No component selected{% endif %}</span>
+    {% if page.paper_url %}<a href="{{ page.paper_url }}">{% if page.lang == 'vi' %}Minh họa tương tác · nguồn gốc ↗{% else %}Interactive redraw · original source ↗{% endif %}</a>{% endif %}
   </div>
-  <figcaption><span>HOW TO READ IT</span>{{ page.visual_caption }}</figcaption>
+  <figcaption><span>{% if page.lang == 'vi' %}CÁCH ĐỌC HÌNH{% else %}HOW TO READ IT{% endif %}</span>{{ page.visual_caption }}</figcaption>
 </figure>

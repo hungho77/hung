@@ -3,6 +3,8 @@ title: "SpinQuant: rotate before you round"
 subtitle: "Why learned rotations tame activation outliers and make W4A4KV4 much less destructive than naive low-bit quantization."
 date: 2026-08-12 17:00:00 +0700
 permalink: /blog/spinquant-learned-rotations/
+lang: en
+translation_url: /vi/blog/spinquant-learned-rotations/
 tags: [SpinQuant, Rotation, W4A4KV4]
 learning_order: 8
 paper_year: "2024"

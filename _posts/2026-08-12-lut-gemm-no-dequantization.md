@@ -3,6 +3,8 @@ title: "LUT-GEMM: low-bit weights without reconstructing them"
 subtitle: "How binary-coded weights become lookup-table indices—and when that changes decode latency rather than only checkpoint size."
 date: 2026-08-12 15:00:00 +0700
 permalink: /blog/lut-gemm-no-dequantization/
+lang: en
+translation_url: /vi/blog/lut-gemm-no-dequantization/
 tags: [CUDA, LUT-GEMM, Kernel]
 learning_order: 7
 paper_year: "2022"

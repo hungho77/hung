@@ -3,6 +3,8 @@ title: "SmoothQuant: moving the hard part offline"
 subtitle: "Why activation outliers break naive W8A8 quantization, and how equivalent scaling restores an efficient INT8 path."
 date: 2026-07-03
 permalink: /blog/smoothquant-explained/
+lang: en
+translation_url: /vi/blog/smoothquant-explained/
 tags: [Quantization, LLM, W8A8]
 learning_order: 4
 paper_year: "2022"

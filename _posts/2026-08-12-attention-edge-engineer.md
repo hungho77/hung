@@ -3,6 +3,8 @@ title: "Attention, viewed from the edge"
 subtitle: "The Transformer shape flow, why training parallelizes, and where autoregressive inference becomes a memory and latency problem."
 date: 2026-08-12 19:00:00 +0700
 permalink: /blog/attention-from-the-edge/
+lang: en
+translation_url: /vi/blog/attention-from-the-edge/
 tags: [Transformer, Attention, Edge AI]
 learning_order: 2
 paper_year: "2017"

@@ -3,6 +3,8 @@ title: "TensorRT Edge-LLM: four fixes from controlled experiments"
 subtitle: "How I separated compiler fusion bugs, lossy AWQ repacking, and a silent InternVL3 export failure—and verified each fix on NVIDIA edge hardware."
 date: 2026-08-11 20:00:00 +0700
 permalink: /blog/debugging-tensorrt-edge-llm/
+lang: en
+translation_url: /vi/blog/debugging-tensorrt-edge-llm/
 tags: [TensorRT, Jetson, Debugging]
 learning_order: 11
 paper_year: "Production"

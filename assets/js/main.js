@@ -1,4 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const isVietnamese = document.documentElement.lang.toLowerCase().startsWith('vi');
+
+  try {
+    const preferredLanguage = window.localStorage.getItem('portfolio-language');
+    const preferredLink = document.querySelector(`[data-language-choice="${preferredLanguage}"]`);
+    const isLanguageLanding = Boolean(document.querySelector('.hero, .blog-page'));
+    if (isLanguageLanding && preferredLink && !preferredLink.classList.contains('is-active')) {
+      window.location.replace(preferredLink.href);
+      return;
+    }
+  } catch (_) { /* Preference storage is optional. */ }
+
+  document.querySelectorAll('[data-language-choice]').forEach((link) => {
+    link.addEventListener('click', () => {
+      try { window.localStorage.setItem('portfolio-language', link.dataset.languageChoice); } catch (_) { /* Preference storage is optional. */ }
+    });
+  });
+
   document.querySelectorAll('a[href]').forEach((link) => {
     const url = new URL(link.getAttribute('href'), window.location.href);
     const isExternal = ['http:', 'https:'].includes(url.protocol) && url.hostname !== window.location.hostname;
@@ -105,6 +123,93 @@ document.addEventListener('DOMContentLoaded', () => {
     ]
   };
 
+  const visualTranslationsVi = {
+    'quant-map': [
+      { kicker: 'BIỂU DIỄN ĐẦU VÀO', title: 'Bắt đầu từ tensor giá trị thực', description: 'Tensor gốc chứa nhiều giá trị floating-point trên một dynamic range rộng; quantization chỉ giữ một tập giá trị biểu diễn hữu hạn.', impact: 'Distribution quan sát được quyết định scale và granularity nào giữ lại thông tin hữu ích.' },
+      { kicker: 'HÀM QUANTIZATION', title: 'Scale, clip rồi round thành code', description: 'Scale chuẩn hóa x, clipping giới hạn range và rounding chọn code gần nhất; dequantization dùng scale để tạo giá trị xấp xỉ.', impact: 'Giá trị ngoài range bị clip, còn giá trị nằm giữa hai code chịu rounding error.' },
+      { kicker: 'BIỂU DIỄN ĐẦU RA', title: 'Đọc mỗi code cùng với scale của nó', description: 'Các entry được lưu là chỉ số codebook, không phải giá trị thực độc lập; symmetric quantization khôi phục gần đúng bằng x̂ = s·xq.', impact: 'Code, scale, zero point và granularity phải đi cùng nhau để tensor packed có ý nghĩa.' },
+      { kicker: 'FORMAT LÀ MỘT PHẦN PHƯƠNG PHÁP', title: 'Bit width không xác định một quantizer duy nhất', description: 'INT8/INT4 dùng level integer đều, còn FP8/NVFP4 dùng floating-point codebook cùng scale scheme khác nhau.', impact: 'Hai format 4-bit có thể khác range, metadata, kernel và accuracy.' },
+      { kicker: 'EXPLICIT QUANTIZATION', title: 'Q/DQ node mã hóa hợp đồng precision', description: 'Trong TensorRT, Quantize và Dequantize node chỉ rõ nơi conversion xảy ra và mang scale của low-precision tensor.', impact: 'Engine cần giữ arithmetic intent này thay vì tự ý đổi precision.' },
+      { kicker: 'CỔNG TRIỂN KHAI', title: 'Compression chỉ thành tốc độ khi có native path', description: 'Packed storage, operator support và low-precision kernel phù hợp phải cùng tồn tại trên GPU đích.', impact: 'Checkpoint size không phải latency; phải benchmark engine và kiểm tra fallback.' }
+    ],
+    attention: [
+      { kicker: 'FIGURE 2 · PROJECTION', title: 'Project cùng token state thành Q, K và V', description: 'Các ma trận học được tạo query, key và value từ X: Q hỏi cần lấy gì, K cung cấp địa chỉ, V mang nội dung.', impact: 'Khi decode chỉ query mới thay đổi; key/value cũ được đọc từ KV cache.' },
+      { kicker: 'EQUATION 1 · ĐỘ TƯƠNG HỢP', title: 'Tính scaled query–key score', description: 'QKᵀ tạo score cho từng cặp, chia √dₖ giữ softmax ổn định và causal mask chặn vị trí tương lai.', impact: 'Full attention tăng bậc hai theo sequence; decode liên tục đọc key cache dài dần.' },
+      { kicker: 'EQUATION 1 · CHUẨN HÓA', title: 'Đổi từng hàng score thành retrieval weight', description: 'Softmax biến score của một query thành probability không âm có tổng bằng một.', impact: 'Fused attention tránh ghi toàn bộ probability matrix ra external memory.' },
+      { kicker: 'FIGURE 2 · WEIGHTED SUM', title: 'Dùng probability để trộn value', description: 'Mỗi probability nhân value tương ứng và tổng của chúng trở thành context cho query.', impact: 'Value là payload, không phải address; vì vậy decode phải cache cả K và V.' },
+      { kicker: 'MULTI-HEAD ATTENTION', title: 'Chạy nhiều attention head song song', description: 'Mỗi head có projection Q/K/V riêng; output được concat rồi biến đổi qua Wᴼ.', impact: 'Các head học quan hệ ở subspace khác nhau và vẫn ánh xạ tốt lên matrix hardware.' }
+    ],
+    int8: [
+      { kicker: 'FIGURE 2 · CALIBRATION', title: 'Thu thập distribution activation thật', description: 'PTQ chạy sample đại diện và tạo histogram; tail hiếm có thể làm lãng phí phần lớn INT8 code.', impact: 'Calibration data phải giống production, nếu không range được tối ưu cho distribution sai.' },
+      { kicker: 'CHÍNH SÁCH CALIBRATION', title: 'Đổi một ít clipping lấy rounding resolution tốt hơn', description: 'Max giữ mọi giá trị nhưng bước lượng tử thô; entropy/percentile cắt tail có kiểm soát để common value dùng grid dày hơn.', impact: 'Không có calibration method tốt nhất cho mọi architecture.' },
+      { kicker: 'EQUATION 4–5', title: 'Ánh xạ range đã chọn vào signed INT8', description: 'Scale và zero point biến đổi real value rồi clip/round thành code trong [−128,127]; dequant chỉ tạo xấp xỉ.', impact: 'INT8 có 256 code và calibration quyết định chúng được dùng ở đâu.' },
+      { kicker: 'SECTION 3.2 · GRANULARITY', title: 'Chỉ chia sẻ scale nơi kernel factor được', description: 'Per-tensor dùng một scale; per-channel weight dùng scale riêng để theo range khác nhau giữa channel.', impact: 'Granularity tăng accuracy nhưng layout scale phải khớp integer matrix multiplication.' },
+      { kicker: 'FIGURE 5 · WORKFLOW', title: 'Chỉ nâng mức can thiệp khi PTQ chưa đủ', description: 'Bắt đầu bằng PTQ, tìm layer nhạy cảm, giữ một phần floating point và chỉ dùng QAT khi cần.', impact: 'INT8 là workflow thực nghiệm, không phải đổi dtype bằng một nút.' }
+    ],
+    smoothquant: [
+      { kicker: 'TRƯỚC · KHÓ', title: 'Activation outlier làm lãng phí range INT8', description: 'Một số channel lớn bất thường buộc per-tensor scale bao phủ peak, khiến common value còn rất ít level hiệu dụng.', impact: 'Outlier—not average—quyết định scale và gây rounding error.' },
+      { kicker: 'BIẾN ĐỔI OFFLINE', title: 'Chuyển scale variance từ X sang W', description: 'SmoothQuant chia Xⱼ cho sⱼ và nhân weight row tương ứng với sⱼ, chuyển độ khó khỏi activation.', impact: 'α điều khiển cách cân bằng magnitude giữa activation và weight.' },
+      { kicker: 'SAU · DỄ', title: 'Activation đã làm mượt dùng level INT8 đều hơn', description: 'Sau X̂ = X·diag(s)⁻¹, outlier giảm và range giữa các channel trở nên tương đương.', impact: 'Static activation quantization lãng phí ít code hơn cho peak hiếm.' },
+      { kicker: 'PHÍA WEIGHT', title: 'Weight đã chỉnh hấp thụ variance', description: 'Ŵ = diag(s)·W mang inverse scale nên một số weight channel lớn lên nhưng vẫn dễ quantize.', impact: 'Per-output-channel weight scale tạo thêm khả năng chịu variance.' },
+      { kicker: 'BẤT BIẾN', title: 'Linear layer không thay đổi', description: 'X̂Ŵ = (X·diag(s)⁻¹)(diag(s)·W) = XW.', impact: 'Scale được fuse offline nên runtime nhận activation mượt mà không cần scaling kernel mới.' }
+    ],
+    gptq: [
+      { kicker: 'OBJECTIVE · EQUATION 1', title: 'Giữ output layer trên calibration data', description: 'GPTQ tìm Q giảm ‖WX−QX‖²; calibration input X quyết định weight error nào thực sự ảnh hưởng output.', impact: 'GPTQ data-aware, không chỉ giảm khoảng cách W và Q.' },
+      { kicker: 'BẬC HAI · STEP 3', title: 'Tính trước inverse-Hessian ổn định', description: 'Từ H đã damping, GPTQ tính Cholesky form của H⁻¹ một lần để lấy hướng correction.', impact: 'Tránh downdate/invert lặp lại vốn không ổn định ở quy mô tỷ parameter.' },
+      { kicker: 'CỘT HIỆN TẠI · ALGORITHM 1', title: 'Quantize một cột đầy đủ theo thứ tự chung', description: 'GPTQ round W[:,j] cho mọi output row, ghi residual đã scale và dùng cùng column order.', impact: 'Hessian work được tái sử dụng thay vì greedy order riêng cho từng row.' },
+      { kicker: 'LAZY BATCHING · TRONG B', title: 'Bù lỗi tuần tự trong active block', description: 'Residual của cột j cập nhật các cột sau trong block trước quyết định rounding kế tiếp.', impact: 'Update tuần tự chỉ nằm trong cửa sổ B cột; paper dùng B=128.' },
+      { kicker: 'LAZY BATCHING · TOÀN CỤC', title: 'Cập nhật phần weight còn lại một lần mỗi block', description: 'Khi block xong, GPTQ dùng accumulated error E cập nhật mọi cột còn lại bằng một matrix operation.', impact: 'Thay nhiều vector update tốn bandwidth bằng GEMM hiệu quả.' }
+    ],
+    awq: [
+      { kicker: 'ACTIVATION AWARENESS · FIGURE 2', title: 'Đo input channel nào mang feature lớn', description: 'AWQ tính average activation magnitude cho từng channel từ calibration set nhỏ.', impact: 'Weight error nhân activation nên activation magnitude là saliency signal mạnh.' },
+      { kicker: 'SALIENCY MAP · FIGURE 2', title: 'Ánh xạ activation saliency vào weight column', description: 'Input channel Xc nhân đúng weight column W[:,c], vì vậy channel activation lớn chỉ ra weight cần bảo vệ.', impact: 'Thí nghiệm giữ 0.1–1% FP16 chứng minh signal, không phải format AWQ cuối.' },
+      { kicker: 'GRID SEARCH · EQUATION 4–5', title: 'Chọn mức bảo vệ salient channel', description: 'AWQ giới hạn scale thành s=sₓ^α và tìm α giảm layer-output difference sau fake quantization.', impact: 'Scaling quá mạnh có thể tăng group step và làm weight không salient sai hơn.' },
+      { kicker: 'PHÂN TÍCH SAI SỐ · EQUATION 2–3', title: 'Scale weight lên và activation xuống', description: 'W′=W·diag(s), X′=diag(s)⁻¹X nên W′X′=WX trong full precision.', impact: 'Salient weight lớn hơn chịu effective quantization error nhỏ hơn.' },
+      { kicker: 'TRIỂN KHAI · WEIGHT ONLY', title: 'Quantize mọi scaled weight vào cùng format', description: 'Sau search, toàn bộ Q(W′) được lưu INT4 còn activation FP16; inverse scale được fuse khi có thể.', impact: 'Không cần FP16 exception mask, giữ packed layout cho W4A16 kernel.' }
+    ],
+    lut: [
+      { kicker: 'SECTION 2.3 · WEIGHT FORMAT', title: 'Biểu diễn weight vector bằng binary plane', description: 'BCQ xấp xỉ weight bằng tổng binary vector có scale và bias tùy chọn.', impact: 'Kernel dùng trực tiếp bit plane và α, không tái dựng FP16 matrix.' },
+      { kicker: 'SECTION 3.1 · ACTIVATION CHUNK', title: 'Chia activation thành subvector dài μ', description: 'Mỗi chunk tạo mọi signed sum có thể; μ=4 tương ứng bảng 2⁴ entry.', impact: 'μ lớn giảm lookup nhưng table size gấp đôi mỗi khi tăng một phần tử.' },
+      { kicker: 'SECTION 3.1 · TÍNH TRƯỚC', title: 'Tạo partial dot product một lần mỗi chunk', description: 'Mỗi table entry là dot product giữa activation subvector và một sign pattern ±1.', impact: 'Table construction phải được amortize để không nuốt lợi ích.' },
+      { kicker: 'FIGURE 2 · RETRIEVAL', title: 'Ghép μ bit làm lookup key', description: 'Pattern packed như 1011 chọn trực tiếp partial sum đã tính.', impact: 'Kernel tính từ compressed bit plane mà không materialize dequantized weight.' },
+      { kicker: 'SECTION 3.1 · REDUCTION', title: 'Cộng lookup rồi áp scale và bias', description: 'Partial sum được cộng qua chunk/plane, nhân α và sửa bằng bias.', impact: 'Latency thật phụ thuộc LUT locality, shared memory, synchronization và occupancy.' }
+    ],
+    spin: [
+      { kicker: 'FIGURE 2–3 · OUTLIER', title: 'Rotation phân tán năng lượng qua channel', description: 'Orthogonal R trải extreme value ra nhiều coordinate và giảm kurtosis.', impact: 'Quantizer dùng range hữu hạn đều hơn sau khi outlier channel biến mất.' },
+      { kicker: 'FIGURE 1 · BẤT BIẾN', title: 'Chèn R và Rᵀ như một cặp triệt tiêu', description: 'Vì RᵀR=I, full-precision transformer function được giữ nguyên.', impact: 'Rotation thay đổi quantization error mà không đổi unquantized model.' },
+      { kicker: 'FIGURE 4 · LEARNED ROTATION', title: 'Tối ưu basis thay vì dùng random draw', description: 'SpinQuant giảm quantized loss trong khi Cayley update giữ R orthogonal.', impact: 'Learned rotation tránh chênh lệch accuracy lớn giữa random rotation.' },
+      { kicker: 'FIGURE 1 · BỐN VỊ TRÍ', title: 'Dùng absorbed và online rotation đúng chỗ', description: 'R1/R2 absorb vào weight; R3/R4 là online Hadamard cho KV cache và FFN activation.', impact: 'Online transform phải đủ rẻ để giữ lợi ích latency.' },
+      { kicker: 'MỤC TIÊU TRIỂN KHAI', title: 'Quantize W, A và KV sau khi học basis', description: 'Đích cuối là network W4A4KV4 thực thi được với merged rotation và low-bit kernel.', impact: 'Giá trị của SpinQuant là thu hẹp gap accuracy khi quantize đồng thời ba tensor class.' }
+    ],
+    paro: [
+      { kicker: 'FIGURE 1 · CHANNEL SCALE', title: 'Cân bằng magnitude trung bình giữa channel', description: 'Channel-wise scaling giảm isolated outlier trước khi pair rotation xử lý geometry cục bộ.', impact: 'Scale cung cấp range control toàn cục mà một stage pair rotation không có.' },
+      { kicker: 'DEFINITION 1 · CẶP ĐỘC LẬP', title: 'Ghép channel không overlap trong một stage', description: 'Mỗi channel xuất hiện tối đa một lần nên mọi Givens pair chạy song song không dependency.', impact: 'Pair độc lập phù hợp với quantization group và GPU parallelism.' },
+      { kicker: 'EQUATION 3–5 · GIVENS', title: 'Xoay đúng hai row bằng một angle học được', description: 'Givens transform trộn row i,j bằng sinθ/cosθ và giữ joint norm.', impact: 'Hai vectorized update thay dense matrix multiplication.' },
+      { kicker: 'EQUATION 8 · CHUỖI', title: 'Xếp nhiều stage để lấy lại expressiveness', description: 'ParoQuant dùng nhiều pairing rời nhau rồi kết hợp channel-wise scaling.', impact: 'Tăng K mở rộng transform có thể đạt được trong khi từng stage vẫn song song.' },
+      { kicker: 'FIGURE 3 · FUSED EXECUTION', title: 'Song song hóa theo token, group và pair', description: 'CUDA transform phân việc độc lập và giữ data nhỏ trong shared memory/register.', impact: 'Runtime transform phải giữ được lợi ích của packed INT4 GEMM phía sau.' }
+    ],
+    vla: [
+      { kicker: 'FIGURE 2 · CONTROL TIMELINE', title: 'Khớp perception, inference và execution vào camera cadence', description: 'VLA đồng bộ nhận frame, chạy vision/VLM/action rồi execute một horizon trước inference tiếp theo.', impact: 'Mục tiêu là closed-loop response budget, không phải throughput model riêng lẻ.' },
+      { kicker: 'EQUATION 2–4 · PERFORMANCE MODEL', title: 'Mô hình hóa compute, memory và network limit', description: 'VLA-Perf cộng operator latency; roofline lấy local cost lớn nhất và placement từ xa thêm network latency.', impact: 'Cùng model có thể đổi bottleneck khi hardware hoặc placement thay đổi.' },
+      { kicker: 'PHÂN RÃ COMPONENT', title: 'Tách latency cho vision, VLM và action', description: 'Mỗi component có token count và arithmetic intensity khác nhau.', impact: 'Chỉ tối ưu component đang sở hữu end-to-end latency trên thiết bị đích.' },
+      { kicker: 'FIGURE 6 · ACTION EXPERT', title: 'Denoising step và action chunk không có cùng chi phí', description: 'Tăng step 5× cần 5× forward pass; tăng token 5× chỉ thêm khoảng 40% trong cấu hình memory-bound của paper.', impact: 'Giảm model iteration có thể quan trọng hơn rút ngắn action chunk.' },
+      { kicker: 'SECTION 4.9 · BẤT ĐỒNG BỘ', title: 'Overlap inference với execution để tăng throughput', description: 'Hệ async suy luận command mới khi robot đang execute chunk trước.', impact: 'Throughput tăng nhưng action dùng observation cũ hơn; phải đánh giá staleness và stability.' }
+    ],
+    debug: [
+      { kicker: 'SYMPTOM KHÔNG PHẢI DIAGNOSIS', title: 'Engine build thành công vẫn có thể sinh output rác', description: 'Conversion chỉ chứng minh TensorRT chấp nhận graph; fusion, packed weight, mapping hoặc buffer vẫn có thể sai số.', impact: 'Bốn root cause tạo cùng garbled token nên final text không chỉ ra subsystem lỗi.' },
+      { kicker: 'ĐỊNH VỊ', title: 'So tensor cho đến divergence đầu tiên', description: 'Đi từ framework reference qua export và TensorRT intermediate; dừng ở cosine collapse sớm nhất.', impact: 'Issue #151 thấy V projection đúng nhưng V cache sai, loại trừ weight và GEMM.' },
+      { kicker: 'BỐN FIX · BỐN NGUYÊN NHÂN', title: 'Tách lỗi compiler, quantizer và exporter', description: 'Các lỗi gồm Myelin FP16, CASK NVFP4, AWQ zero-point folding và checkpoint key không match.', impact: 'Mỗi nguyên nhân cần fix khác nhau; workaround rộng sẽ che regression.' },
+      { kicker: 'A/B CÓ KIỂM SOÁT', title: 'Giữ graph/data cố định và chỉ đổi một quyết định', description: 'Chỉ expose V projection làm cache cosine tăng từ khoảng .015 lên 1.0.', impact: 'Materialization test chỉ vào tensor lifetime, reuse hoặc generated fusion thay vì model math.' },
+      { kicker: 'NGƯỠNG XÁC MINH', title: 'Yêu cầu bằng chứng tensor, output và hiệu năng', description: 'Fix hoàn chỉnh phải khôi phục intermediate agreement, generation đúng và latency chấp nhận được.', impact: 'Workaround chưa hoàn chỉnh nếu chỉ làm một prompt đọc được hoặc tắt optimized path.' }
+    ]
+  };
+
+  if (isVietnamese) {
+    Object.entries(visualTranslationsVi).forEach(([kind, translations]) => {
+      visualExplanations[kind]?.forEach((entry, index) => Object.assign(entry, translations[index] || {}));
+    });
+  }
+
   document.querySelectorAll('[data-article-visual]').forEach((visual) => {
     const entries = visualExplanations[visual.dataset.visualKind] || [];
     const groups = [...visual.querySelectorAll('[data-visual-step]')];
@@ -127,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       visual.querySelectorAll('.is-explaining').forEach((element) => element.classList.remove('is-explaining'));
       inspector?.classList.remove('is-updating');
-      if (status) status.textContent = 'No component selected';
+      if (status) status.textContent = isVietnamese ? 'Chưa chọn thành phần' : 'No component selected';
     };
 
     const selectEntry = (entry, index) => {
@@ -155,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (title) title.textContent = entry.title;
       if (description) description.textContent = entry.description;
       if (impact) impact.textContent = entry.impact;
-      if (status) status.textContent = `Selected ${String(index + 1).padStart(2, '0')} / ${String(entries.length).padStart(2, '0')} · ${entry.title}`;
+      if (status) status.textContent = `${isVietnamese ? 'Đã chọn' : 'Selected'} ${String(index + 1).padStart(2, '0')} / ${String(entries.length).padStart(2, '0')} · ${entry.title}`;
       const selectedBounds = entry.elements[0]?.getBoundingClientRect();
       inspector?.classList.toggle('dock-top', Boolean(selectedBounds && selectedBounds.top + selectedBounds.height / 2 > window.innerHeight / 2));
       const keepViewportStable = () => {
@@ -181,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
         element.tabIndex = 0;
         element.setAttribute('role', 'button');
         element.setAttribute('aria-pressed', 'false');
-        element.setAttribute('aria-label', `Explain ${entry.title}`);
+        element.setAttribute('aria-label', `${isVietnamese ? 'Giải thích' : 'Explain'} ${entry.title}`);
         element.addEventListener('click', (event) => {
           event.preventDefault();
           event.stopPropagation();
@@ -345,17 +450,17 @@ document.addEventListener('DOMContentLoaded', () => {
         context: 'Qwen3-ASR-1.7B · vLLM · RTX 5090',
         defaultMethod: 'fp8',
         methods: [
-          { id: 'bf16', name: 'BF16', detail: 'BASELINE', memory: 3.87, rtf: 0.0190, throughput: 15.42, throughputUnit: 'req/s', wer: 7.34, summary: 'Reference precision and accuracy, with the largest memory footprint.' },
-          { id: 'fp8', name: 'FP8', detail: 'W8A8', memory: 2.55, rtf: 0.0152, throughput: 19.37, throughputUnit: 'req/s', wer: 7.60, summary: 'The strongest throughput result with 34% less memory and a small WER change.' },
-          { id: 'nvfp4', name: 'NVFP4', detail: '4-BIT', memory: 1.99, rtf: 0.0186, throughput: 15.77, throughputUnit: 'req/s', wer: 10.73, summary: 'The smallest footprint, trading more recognition accuracy for memory efficiency.' }
+          { id: 'bf16', name: 'BF16', detail: 'BASELINE', memory: 3.87, rtf: 0.0190, throughput: 15.42, throughputUnit: 'req/s', wer: 7.34, summary: 'Reference precision and accuracy, with the largest memory footprint.', summaryVi: 'Precision và accuracy tham chiếu, đồng thời dùng nhiều bộ nhớ nhất.' },
+          { id: 'fp8', name: 'FP8', detail: 'W8A8', memory: 2.55, rtf: 0.0152, throughput: 19.37, throughputUnit: 'req/s', wer: 7.60, summary: 'The strongest throughput result with 34% less memory and a small WER change.', summaryVi: 'Thông lượng tốt nhất, giảm 34% bộ nhớ với thay đổi WER nhỏ.' },
+          { id: 'nvfp4', name: 'NVFP4', detail: '4-BIT', memory: 1.99, rtf: 0.0186, throughput: 15.77, throughputUnit: 'req/s', wer: 10.73, summary: 'The smallest footprint, trading more recognition accuracy for memory efficiency.', summaryVi: 'Dung lượng nhỏ nhất, đổi một phần accuracy nhận dạng lấy hiệu quả bộ nhớ.' }
         ]
       },
       jetson: {
         context: 'Qwen3-ASR-1.7B · TensorRT Edge-LLM · Jetson Orin Nano 8GB',
         defaultMethod: 'int4-awq',
         methods: [
-          { id: 'int8-sq', name: 'INT8 SmoothQuant', detail: 'W8A8', memory: 4.2, rtf: 0.2190, throughput: 1.29, throughputUnit: 'samples/s', wer: 9.07, summary: 'INT8 activations and weights for a production-friendly Tensor Core path.' },
-          { id: 'int4-awq', name: 'INT4 AWQ', detail: 'W4A16', memory: 3.3, rtf: 0.1641, throughput: 1.72, throughputUnit: 'samples/s', wer: 8.69, summary: 'Lower memory, lower RTF, higher throughput, and slightly better WER in this edge run.' }
+          { id: 'int8-sq', name: 'INT8 SmoothQuant', detail: 'W8A8', memory: 4.2, rtf: 0.2190, throughput: 1.29, throughputUnit: 'samples/s', wer: 9.07, summary: 'INT8 activations and weights for a production-friendly Tensor Core path.', summaryVi: 'Activation và weight INT8 cho đường Tensor Core thân thiện với production.' },
+          { id: 'int4-awq', name: 'INT4 AWQ', detail: 'W4A16', memory: 3.3, rtf: 0.1641, throughput: 1.72, throughputUnit: 'samples/s', wer: 8.69, summary: 'Lower memory, lower RTF, higher throughput, and slightly better WER in this edge run.', summaryVi: 'Bộ nhớ và RTF thấp hơn, throughput cao hơn, WER tốt hơn nhẹ trong lần chạy edge này.' }
         ]
       }
     };
@@ -386,7 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateReadout = (method) => {
       const methods = datasets[activePlatform].methods;
       output.name.textContent = method.name;
-      output.summary.textContent = method.summary;
+      output.summary.textContent = isVietnamese ? method.summaryVi : method.summary;
       output.context.textContent = datasets[activePlatform].context;
       output.memory.textContent = `${method.memory.toFixed(method.memory % 1 ? 2 : 0)} GB`;
       output.rtf.textContent = method.rtf.toFixed(4);

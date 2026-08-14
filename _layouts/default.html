@@ -1,5 +1,8 @@
+{% assign current_lang = page.lang | default: 'en' %}
+{% if current_lang == 'vi' %}{% assign is_vi = true %}{% assign home_path = '/vi/' %}{% assign blog_path = '/vi/blog/' %}{% else %}{% assign is_vi = false %}{% assign home_path = '/' %}{% assign blog_path = '/blog/' %}{% endif %}
+{% if page.translation_url %}{% if is_vi %}{% assign en_path = page.translation_url %}{% assign vi_path = page.url %}{% else %}{% assign en_path = page.url %}{% assign vi_path = page.translation_url %}{% endif %}{% else %}{% assign en_path = '/' %}{% assign vi_path = '/vi/' %}{% endif %}
 <!doctype html>
-<html lang="en">
+<html lang="{% if is_vi %}vi{% else %}en{% endif %}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,44 +11,51 @@
   <meta name="theme-color" content="#071a36">
   <meta property="og:title" content="{% if page.title %}{{ page.title }} · {% endif %}{{ site.title }}">
   <meta property="og:description" content="{{ page.description | default: site.description }}">
+  <link rel="alternate" hreflang="en" href="{{ en_path | absolute_url }}">
+  <link rel="alternate" hreflang="vi" href="{{ vi_path | absolute_url }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v=20260814-16">
-  <script defer src="{{ '/assets/js/main.js' | relative_url }}?v=20260814-16"></script>
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v=20260815-1">
+  <script defer src="{{ '/assets/js/main.js' | relative_url }}?v=20260815-1"></script>
 </head>
 <body>
   <div class="page-glow" aria-hidden="true"></div>
   <header class="site-header section-shell">
-    <a class="site-logo" href="{{ '/' | relative_url }}?v=20260813-1" aria-label="Ho Thinh Hung — Home">
+    <a class="site-logo" href="{{ home_path | relative_url }}" aria-label="Ho Thinh Hung — {% if is_vi %}Trang chủ{% else %}Home{% endif %}">
       <svg viewBox="0 0 42 42" aria-hidden="true" focusable="false">
         <path class="logo-frame" d="M5 5h23l9 9v23H5z"/>
         <path class="logo-letter" d="M11 11v20m0-10h9m0-10v20M25 11h8m-4 0v20"/>
         <path class="logo-signal" d="M32 5v8h8"/>
       </svg>
     </a>
-    <button class="menu-button" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span></button>
+    <button class="menu-button" aria-label="{% if is_vi %}Mở menu{% else %}Toggle menu{% endif %}" aria-expanded="false"><span></span><span></span></button>
     <nav>
-      <a href="{{ '/' | relative_url }}?v=20260813-1#work">Work</a>
-      <a href="{{ '/' | relative_url }}?v=20260813-1#about">About</a>
-      <a href="{{ '/' | relative_url }}?v=20260813-1#research">Research</a>
-      <a href="{{ '/blog/' | relative_url }}?v=20260813-1">Notes</a>
-      <a class="nav-pill" href="{{ site.author.linkedin_url }}">Let’s connect <span>↗</span></a>
+      <a href="{{ home_path | relative_url }}#work">{% if is_vi %}Dự án{% else %}Work{% endif %}</a>
+      <a href="{{ home_path | relative_url }}#about">{% if is_vi %}Giới thiệu{% else %}About{% endif %}</a>
+      <a href="{{ home_path | relative_url }}#research">{% if is_vi %}Nghiên cứu{% else %}Research{% endif %}</a>
+      <a href="{{ blog_path | relative_url }}">{% if is_vi %}Bài viết{% else %}Notes{% endif %}</a>
+      <div class="language-switch" role="group" aria-label="{% if is_vi %}Chọn ngôn ngữ{% else %}Choose language{% endif %}">
+        <a href="{{ en_path | relative_url }}" hreflang="en" lang="en" data-language-choice="en"{% unless is_vi %} class="is-active" aria-current="page"{% endunless %}>EN</a>
+        <span aria-hidden="true">/</span>
+        <a href="{{ vi_path | relative_url }}" hreflang="vi" lang="vi" data-language-choice="vi"{% if is_vi %} class="is-active" aria-current="page"{% endif %}>VI</a>
+      </div>
+      <a class="nav-pill" href="{{ site.author.linkedin_url }}">{% if is_vi %}Kết nối{% else %}Let’s connect{% endif %} <span>↗</span></a>
     </nav>
   </header>
 
   {{ content }}
 
-  <div class="page-shortcuts" aria-label="Page shortcuts">
-    <button class="page-shortcut top-shortcut" type="button" data-scroll-top aria-label="Back to top" aria-hidden="true" tabindex="-1"><span aria-hidden="true">↑</span></button>
+  <div class="page-shortcuts" aria-label="{% if is_vi %}Điều hướng trang{% else %}Page shortcuts{% endif %}">
+    <button class="page-shortcut top-shortcut" type="button" data-scroll-top aria-label="{% if is_vi %}Lên đầu trang{% else %}Back to top{% endif %}" aria-hidden="true" tabindex="-1"><span aria-hidden="true">↑</span></button>
   </div>
 
   <footer class="site-footer">
     <div class="section-shell footer-grid">
-      <div><p class="section-index">LET’S CONNECT</p><h2>Have an ambitious<br>AI problem?</h2></div>
-      <div class="footer-right"><p>I’m always interested in thoughtful conversations about edge AI, model optimization, and robotics.</p><a class="button footer-button" href="{{ site.author.linkedin_url }}">Start a conversation <span>↗</span></a></div>
+      <div><p class="section-index">{% if is_vi %}KẾT NỐI{% else %}LET’S CONNECT{% endif %}</p><h2>{% if is_vi %}Bạn có một bài toán<br>AI đầy tham vọng?{% else %}Have an ambitious<br>AI problem?{% endif %}</h2></div>
+      <div class="footer-right"><p>{% if is_vi %}Mình luôn hứng thú với những cuộc trao đổi sâu về edge AI, tối ưu mô hình và robotics.{% else %}I’m always interested in thoughtful conversations about edge AI, model optimization, and robotics.{% endif %}</p><a class="button footer-button" href="{{ site.author.linkedin_url }}">{% if is_vi %}Bắt đầu trò chuyện{% else %}Start a conversation{% endif %} <span>↗</span></a></div>
     </div>
-    <div class="section-shell footer-bottom"><span>© {{ 'now' | date: '%Y' }} Ho Thinh Hung</span><span>Built with intention · Hosted on GitHub Pages</span></div>
+    <div class="section-shell footer-bottom"><span>© {{ 'now' | date: '%Y' }} Ho Thinh Hung</span><span>{% if is_vi %}Được xây dựng có chủ đích · Lưu trữ trên GitHub Pages{% else %}Built with intention · Hosted on GitHub Pages{% endif %}</span></div>
   </footer>
 </body>
 </html>

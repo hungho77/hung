@@ -3,6 +3,8 @@ title: "GPTQ: quantizing with second-order information"
 subtitle: "How Hessian-aware error compensation, lazy updates, and Cholesky reformulation made 3–4 bit LLM quantization practical."
 date: 2026-08-12 18:00:00 +0700
 permalink: /blog/gptq-second-order-quantization/
+lang: en
+translation_url: /vi/blog/gptq-second-order-quantization/
 tags: [GPTQ, INT4, LLM]
 learning_order: 5
 paper_year: "2022"

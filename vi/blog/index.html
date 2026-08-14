@@ -1,0 +1,41 @@
+---
+layout: default
+title: Bài viết kỹ thuật
+description: Ghi chú tiếng Việt về edge AI, VLA, inference và tối ưu mô hình.
+lang: vi
+translation_url: /blog/
+permalink: /vi/blog/
+---
+<main class="blog-page section-shell">
+  <div class="blog-hero-grid">
+    <header class="blog-header reveal">
+      <p class="section-index">HỌC CÔNG KHAI · NHẬT KÝ KỸ THUẬT</p>
+      <h1>Nghiên cứu,<br>đưa vào thực tế.</h1>
+      <p>Ghi chú nghiên cứu được viết lại thành các bài tiếng Việt hướng thực hành, cùng những điều tra trực tiếp về edge AI, VLA, hiệu năng inference và hệ thống production.</p>
+      <div class="blog-summary" aria-label="Tóm tắt thư viện nghiên cứu">
+        {% assign vietnamese_posts = site.posts | where: "lang", "vi" %}
+        <span><strong>{{ vietnamese_posts | size }}</strong> bài viết</span>
+        <span><strong>Paper → Thực hành</strong> trọng tâm</span>
+      </div>
+    </header>
+    <div class="research-signal reveal" aria-hidden="true">
+      <div class="signal-orbit signal-orbit-a"></div><div class="signal-orbit signal-orbit-b"></div>
+      <span class="signal-node signal-node-a">MODEL</span><span class="signal-node signal-node-b">KERNEL</span><span class="signal-node signal-node-c">EDGE</span>
+      <span class="signal-core">HỌC<br><b>→</b><br>LÀM</span><i class="signal-beam signal-beam-a"></i><i class="signal-beam signal-beam-b"></i><i class="signal-beam signal-beam-c"></i>
+    </div>
+  </div>
+  <div class="learning-path-header reveal">
+    <div><p class="section-index">LỘ TRÌNH ĐỌC ĐỀ XUẤT</p><strong>Đi theo cách các ý tưởng phát triển.</strong></div>
+    <p><span>Nền tảng</span><i>→</i><span>Quantization</span><i>→</i><span>Triển khai</span></p>
+  </div>
+  <div class="post-list post-list-large">
+    {% assign learning_posts = site.posts | where: "lang", "vi" | sort: "learning_order" %}
+    {% for post in learning_posts %}
+    <a class="post-row reveal" href="{{ post.url | relative_url }}" data-stagger="{{ forloop.index0 }}">
+      <div class="post-step"><small>Bước {{ forloop.index }}</small><time>{{ post.paper_year }}</time><span>{{ post.learning_stage }}</span></div>
+      <div>{% if post.tags %}<div class="post-tags">{% for tag in post.tags %}<span>{{ tag }}</span>{% endfor %}</div>{% endif %}<h2>{{ post.title }}</h2><p>{{ post.subtitle | default: post.excerpt | strip_html | truncate: 170 }}</p></div>
+      <span class="post-arrow">↗</span>
+    </a>
+    {% endfor %}
+  </div>
+</main>

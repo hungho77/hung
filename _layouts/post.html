@@ -3,30 +3,32 @@ layout: default
 ---
 <div class="reading-progress" aria-hidden="true"><span data-reading-progress></span></div>
 <main class="post-page section-shell" data-post-page>
-  <a class="back-link" href="{{ '/blog/' | relative_url }}?v=20260813-1">← All engineering notes</a>
+  {% assign post_lang = page.lang | default: 'en' %}
+  {% if post_lang == 'vi' %}{% assign post_is_vi = true %}{% assign post_blog_path = '/vi/blog/' %}{% else %}{% assign post_is_vi = false %}{% assign post_blog_path = '/blog/' %}{% endif %}
+  <a class="back-link" href="{{ post_blog_path | relative_url }}">← {% if post_is_vi %}Tất cả bài viết kỹ thuật{% else %}All engineering notes{% endif %}</a>
   <header class="post-header">
-    <p class="section-index">STEP {{ page.learning_order }} · {{ page.paper_year }} · {{ page.learning_stage }}</p>
+    <p class="section-index">{% if post_is_vi %}BƯỚC{% else %}STEP{% endif %} {{ page.learning_order }} · {{ page.paper_year }} · {{ page.learning_stage }}</p>
     <h1>{{ page.title }}</h1>
     {% if page.subtitle %}<p class="post-subtitle">{{ page.subtitle }}</p>{% endif %}
     {% if page.tags %}<div class="post-tags post-header-tags">{% for tag in page.tags %}<span>{{ tag }}</span>{% endfor %}</div>{% endif %}
-    <div class="post-reading-meta" aria-label="Article information">
-      <span><strong data-read-minutes>—</strong> min read</span>
-      <span><strong data-section-count>—</strong> sections</span>
+    <div class="post-reading-meta" aria-label="{% if post_is_vi %}Thông tin bài viết{% else %}Article information{% endif %}">
+      <span><strong data-read-minutes>—</strong> {% if post_is_vi %}phút đọc{% else %}min read{% endif %}</span>
+      <span><strong data-section-count>—</strong> {% if post_is_vi %}mục{% else %}sections{% endif %}</span>
       <span><i aria-hidden="true"></i> {{ page.paper_year }} · {{ page.learning_stage }}</span>
     </div>
   </header>
   {% include article-visual.html %}
   <div class="post-reading-layout">
-    <aside class="post-map" aria-label="Article map">
+    <aside class="post-map" aria-label="{% if post_is_vi %}Mục lục bài viết{% else %}Article map{% endif %}">
       <div class="post-map-inner">
-        <div class="post-map-heading"><span>Article map</span><strong data-map-percent>0%</strong></div>
+        <div class="post-map-heading"><span>{% if post_is_vi %}Mục lục{% else %}Article map{% endif %}</span><strong data-map-percent>0%</strong></div>
         <nav data-post-toc></nav>
         <div class="post-map-track" aria-hidden="true"><span data-map-progress></span></div>
       </div>
     </aside>
     <article class="post-content" data-post-content>{{ content }}</article>
   </div>
-  {% assign learning_posts = site.posts | sort: "learning_order" %}
+  {% assign learning_posts = site.posts | where: "lang", post_lang | sort: "learning_order" %}
   {% assign next_note = nil %}
   {% for note in learning_posts %}
     {% if note.url == page.url %}
@@ -34,18 +36,18 @@ layout: default
       {% assign next_note = learning_posts[next_index] %}
     {% endif %}
   {% endfor %}
-  <nav class="learning-next" aria-label="Continue the learning path">
+  <nav class="learning-next" aria-label="{% if post_is_vi %}Tiếp tục lộ trình đọc{% else %}Continue the learning path{% endif %}">
     {% if next_note %}
     <a href="{{ next_note.url | relative_url }}?v=20260813-1">
-      <span>Continue learning · Step {{ next_note.learning_order }}</span>
+      <span>{% if post_is_vi %}Đọc tiếp · Bước{% else %}Continue learning · Step{% endif %} {{ next_note.learning_order }}</span>
       <strong>{{ next_note.title }}</strong>
-      <i>Next note →</i>
+      <i>{% if post_is_vi %}Bài tiếp theo{% else %}Next note{% endif %} →</i>
     </a>
     {% else %}
-    <a href="{{ '/blog/' | relative_url }}?v=20260813-1">
-      <span>Learning path complete</span>
-      <strong>Return to the research library</strong>
-      <i>View all notes →</i>
+    <a href="{{ post_blog_path | relative_url }}">
+      <span>{% if post_is_vi %}Đã hoàn thành lộ trình{% else %}Learning path complete{% endif %}</span>
+      <strong>{% if post_is_vi %}Quay lại thư viện nghiên cứu{% else %}Return to the research library{% endif %}</strong>
+      <i>{% if post_is_vi %}Xem tất cả bài viết{% else %}View all notes{% endif %} →</i>
     </a>
     {% endif %}
   </nav>

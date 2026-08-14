@@ -3,6 +3,8 @@ title: "INT8 without folklore"
 subtitle: "Range mapping, calibration, partial quantization, and a production workflow for models that must remain accurate at the edge."
 date: 2026-08-12 20:00:00 +0700
 permalink: /blog/integer-quantization-int8/
+lang: en
+translation_url: /vi/blog/integer-quantization-int8/
 tags: [INT8, Calibration, Edge AI]
 learning_order: 3
 paper_year: "2020"

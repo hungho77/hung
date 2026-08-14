@@ -3,6 +3,8 @@ title: "AWQ: protect what activations reveal"
 subtitle: "An engineering explanation of salient channels, INT4 weight-only quantization, and why the runtime matters."
 date: 2026-06-06
 permalink: /blog/awq-explained/
+lang: en
+translation_url: /vi/blog/awq-explained/
 tags: [Quantization, LLM, INT4]
 learning_order: 6
 paper_year: "2023"

@@ -2,6 +2,8 @@
 layout: default
 title: Engineering Notes
 description: Notes on edge AI, VLA models, inference, and model optimization.
+lang: en
+translation_url: /vi/blog/
 ---
 <main class="blog-page section-shell">
   <div class="blog-hero-grid">
@@ -10,7 +12,8 @@ description: Notes on edge AI, VLA models, inference, and model optimization.
       <h1>Research,<br>made practical.</h1>
       <p>Research notes rewritten as practical English articles, plus first-hand investigations from edge AI, VLA models, inference performance, and production systems.</p>
       <div class="blog-summary" aria-label="Research library summary">
-        <span><strong>{{ site.posts | size }}</strong> field notes</span>
+        {% assign english_posts = site.posts | where: "lang", "en" %}
+        <span><strong>{{ english_posts | size }}</strong> field notes</span>
         <span><strong>Papers → Practice</strong> focus</span>
       </div>
     </header>
@@ -31,7 +34,7 @@ description: Notes on edge AI, VLA models, inference, and model optimization.
     <p><span>Foundation</span><i>→</i><span>Quantization</span><i>→</i><span>Deployment</span></p>
   </div>
   <div class="post-list post-list-large">
-    {% assign learning_posts = site.posts | sort: "learning_order" %}
+    {% assign learning_posts = site.posts | where: "lang", "en" | sort: "learning_order" %}
     {% for post in learning_posts %}
     <a class="post-row reveal" href="{{ post.url | relative_url }}?v=20260813-1" data-stagger="{{ forloop.index0 }}">
       <div class="post-step"><small>Step {{ forloop.index }}</small><time>{{ post.paper_year }}</time><span>{{ post.learning_stage }}</span></div>

@@ -3,6 +3,8 @@ title: "VLA-Perf: How to reason about VLA inference"
 subtitle: "A practical map of compute, memory, network, and action-generation bottlenecks in Vision-Language-Action systems."
 date: 2026-08-11
 permalink: /blog/vla-perf-inference-performance/
+lang: en
+translation_url: /vi/blog/vla-perf-inference-performance/
 tags: [VLA, Robotics, Performance]
 learning_order: 10
 paper_year: "Applied"
