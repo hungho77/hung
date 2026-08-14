@@ -9,10 +9,10 @@ paper_year: "2023"
 learning_stage: Salience aware
 visual_type: awq
 paper_url: "https://arxiv.org/abs/2306.00978"
-visual_title: "Let activations reveal the sensitive channels"
-visual_alt: "Animated AWQ diagram using activation magnitude to identify and protect salient weight channels"
-visual_caption: "AWQ observes activation statistics, protects a small set of salient channels through scaling, and quantizes the remaining weights aggressively."
-visual_steps: ["Probe activations", "Protect salience", "Run W4A16"]
+visual_title: "From activation saliency to regular W4A16"
+visual_alt: "Interactive AWQ diagram showing activation statistics, channel saliency, alpha search, equivalent scaling, and uniform INT4 weights"
+visual_caption: "AWQ uses activation magnitude to derive per-input-channel scales, searches their strength, applies an equivalent transform, then quantizes every scaled weight in one regular low-bit format."
+visual_steps: ["Observe activations", "Search scaling", "Quantize all weights"]
 ---
 
 AWQ is a post-training, weight-only quantization method designed to compress language and vision-language models to INT4 or INT3 without retraining. Its central observation is that weights do not matter equally—and activation statistics tell us which channels are most sensitive.
@@ -31,17 +31,19 @@ Suppose a quantized weight has an error `e`. Its contribution to output error is
 
 That is why ranking weights only by their own magnitude is incomplete. AWQ collects a small calibration set, records activation statistics, and identifies channels where quantization error would be amplified.
 
-Only a small fraction of channels need special protection, but storing those individual weights in FP16 creates an irregular mixed-precision layout. Kernels would need masks, branches, or separate GEMMs. The model might be smaller, yet the runtime could become slower.
+The paper first tests this hypothesis by keeping only 0.1–1% of activation-selected weight channels in FP16. That experiment sharply improves perplexity, but it is evidence for the saliency signal—not the final AWQ format. Storing those exceptions in FP16 would create an irregular mixed-precision layout that is difficult to accelerate.
 
 ## Scaling instead of mixed precision
 
-AWQ protects an important input channel by scaling its weights up before quantization and scaling the corresponding activation down. Before quantization, the transformations cancel:
+AWQ protects an important input channel by scaling its matching weight column up before quantization and scaling that activation channel down. For a linear layer `Y = WX`, define:
 
-`(sW) · (X / s) = WX`
+`W′ = W · diag(s)` and `X′ = diag(s)⁻¹ · X`
 
-After quantization, the larger scaled weight generally has lower relative rounding error. The full matrix can still be packed into a uniform INT4 or INT3 representation, which is much easier for a fast kernel to consume.
+The transformations cancel before quantization: `W′X′ = WX`. AWQ changes the ranges seen by the quantizer, not the original full-precision function.
 
-The scale cannot grow without limit. An oversized channel can expand the range of its quantization group and make every other weight coarser. AWQ therefore searches for a balance that minimizes layer-output error rather than simply maximizing protection.
+After quantization, a scaled salient weight generally has lower effective rounding error. If the group quantization step changes little (`Δ′ ≈ Δ`), the paper’s analysis gives an error ratio of approximately `1/s`. The full matrix can still be packed into one uniform INT4 or INT3 representation.
+
+The scale cannot grow without limit. An oversized channel can expand the range of its quantization group and make every other weight coarser. AWQ restricts the search to `s = sX^α`, where `sX` is the average activation magnitude per input channel, then grid-searches `α ∈ [0, 1]` to minimize layer-output error after quantization. This needs neither backpropagation nor weight reconstruction.
 
 ## Why the engine is part of the method
 

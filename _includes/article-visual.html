@@ -85,10 +85,52 @@
         <div class="gptq-global-step"><small>03 · LAZY UPDATE</small><strong>W[:,B:] ← W − ER[B,B:]</strong><span>After the block, update all remaining columns with one matrix operation.</span></div>
       </div>
     {% when 'awq' %}
-      <div class="activation-probe visual-panel" data-visual-step="1"><small>ACTIVATION PROBE</small><div class="probe-wave"><i></i><i></i><i></i><i></i><i></i></div><b>Which channels matter?</b></div>
-      <div class="channel-bank visual-panel" data-visual-step="2"><small>WEIGHT CHANNELS</small>{% for i in (1..8) %}<i><span>c{{ i }}</span></i>{% endfor %}</div>
-      <div class="awq-shield" data-visual-step="2"><b>≈1%</b><span>salient weights</span></div>
-      <div class="visual-result" data-visual-step="3"><strong>W4A16</strong><span>INT4 weights · FP16 activations</span><small>Protect sensitive channels, then run a real weight-only kernel.</small></div>
+      <div class="awq-paper-flow" data-visual-step="1">
+        <div class="awq-activation-stats visual-panel">
+          <header><small>01 · ACTIVATION STATISTICS</small><strong>s<sub>X,c</sub> = mean |X<sub>c</sub>|</strong></header>
+          <div class="awq-activation-bars" aria-label="Average activation magnitude per input channel">
+            {% for c in (1..8) %}<span><i></i><b>c{{ c }}</b></span>{% endfor %}
+          </div>
+          <p>Large activation magnitude marks the important input channels.</p>
+        </div>
+        <div class="awq-channel-link" aria-hidden="true"><span>same input channel</span><i>→</i></div>
+        <div class="awq-salient-map visual-panel">
+          <header><small>02 · WEIGHT SALIENCY</small><strong>columns of W</strong></header>
+          <div class="awq-weight-columns" aria-label="Weight matrix columns aligned with activation channels">
+            {% for c in (1..8) %}<span>{% for r in (1..4) %}<i></i>{% endfor %}<b>c{{ c }}</b></span>{% endfor %}
+          </div>
+          <p><b>0.1–1%</b> FP16 was the diagnostic experiment—not the deployed format.</p>
+        </div>
+      </div>
+      <div class="awq-alpha-search visual-panel" data-visual-step="2">
+        <header><small>03 · DATA-DRIVEN SEARCH</small><strong>s = s<sub>X</sub><sup>α</sup></strong></header>
+        <div class="awq-search-plot" aria-label="Grid search over alpha from zero to one">
+          <span style="--x:0%;--y:70%"><i></i><b>0</b></span>
+          <span style="--x:25%;--y:43%"><i></i><b>.25</b></span>
+          <span class="is-optimal" style="--x:50%;--y:18%"><i></i><b>α*</b></span>
+          <span style="--x:75%;--y:40%"><i></i><b>.75</b></span>
+          <span style="--x:100%;--y:63%"><i></i><b>1</b></span>
+          <em aria-hidden="true"></em>
+        </div>
+        <code>α* = arg min ‖Q(W·diag(s))diag(s)⁻¹X − WX‖</code>
+        <p>Search balances salient-channel protection against extra error elsewhere.</p>
+      </div>
+      <div class="awq-scale-transform visual-panel" data-visual-step="3">
+        <header><small>04 · EQUIVALENT TRANSFORM</small><strong>scale before quantization</strong></header>
+        <div class="awq-transform-equation">
+          <div class="awq-transform-side awq-weight-scale"><span>W′</span><b>W · diag(s)</b><small>salient columns ↑</small></div>
+          <i>×</i>
+          <div class="awq-transform-side awq-activation-scale"><span>X′</span><b>diag(s)⁻¹ · X</b><small>same channels ↓</small></div>
+          <i>=</i>
+          <div class="awq-invariant"><span>Y</span><b>W′X′ = WX</b><small>full-precision output unchanged</small></div>
+        </div>
+        <div class="awq-error-ratio"><span>salient error ratio</span><strong>≈ 1 / s</strong><i>when Δ′ ≈ Δ</i></div>
+      </div>
+      <div class="awq-uniform-output" data-visual-step="4">
+        <div class="awq-packed-grid" aria-label="Every weight stored in one uniform low-bit format">{% for i in (1..24) %}<i></i>{% endfor %}</div>
+        <div><small>05 · DEPLOYED REPRESENTATION</small><strong>ALL WEIGHTS · INT4</strong><span>activations FP16 · regular W4A16 kernel</span></div>
+        <b>no mixed precision</b>
+      </div>
     {% when 'lut' %}
       <div class="bit-packets visual-panel" data-visual-step="1"><small>PACKED WEIGHTS</small><span>101</span><span>011</span><span>110</span><span>001</span></div>
       <div class="visual-transfer" data-visual-step="2"><span>use bits as address</span><i>→</i></div>
