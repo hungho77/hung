@@ -137,7 +137,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const inspectorBounds = inspector?.getBoundingClientRect();
       if (inspectorBounds && (inspectorBounds.bottom > window.innerHeight - 16 || inspectorBounds.top < 16)) {
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        inspector.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+        const centeredTop = window.scrollY + inspectorBounds.top - (window.innerHeight - inspectorBounds.height) / 2;
+        window.scrollTo({ top: centeredTop, behavior: reduceMotion ? 'auto' : 'smooth' });
       }
       visual.explainTimer = window.setTimeout(() => {
         entry.elements.forEach((element) => element.classList.remove('is-explaining'));
