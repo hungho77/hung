@@ -116,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearSelection = () => {
       clearTimeout(visual.explainTimer);
       visual.classList.remove('has-selection');
+      inspector?.classList.remove('dock-top');
       groups.forEach((group) => group.classList.remove('is-related'));
       visual.querySelectorAll('.explainable').forEach((element) => {
         element.classList.remove('is-selected', 'is-explaining');
@@ -126,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const selectEntry = (entry, index) => {
+      const viewportPosition = { x: window.scrollX, y: window.scrollY };
       clearTimeout(visual.explainTimer);
       visual.classList.add('has-selection');
       groups.forEach((group) => group.classList.remove('is-related'));
@@ -149,6 +151,18 @@ document.addEventListener('DOMContentLoaded', () => {
       if (description) description.textContent = entry.description;
       if (impact) impact.textContent = entry.impact;
       if (status) status.textContent = `Selected ${String(index + 1).padStart(2, '0')} / ${String(entries.length).padStart(2, '0')} · ${entry.title}`;
+      const selectedBounds = entry.elements[0]?.getBoundingClientRect();
+      inspector?.classList.toggle('dock-top', Boolean(selectedBounds && selectedBounds.top + selectedBounds.height / 2 > window.innerHeight / 2));
+      const keepViewportStable = () => {
+        if (Math.abs(window.scrollY - viewportPosition.y) < 1 && Math.abs(window.scrollX - viewportPosition.x) < 1) return;
+        const previousBehavior = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = 'auto';
+        window.scrollTo(viewportPosition.x, viewportPosition.y);
+        document.documentElement.style.scrollBehavior = previousBehavior;
+      };
+      keepViewportStable();
+      window.requestAnimationFrame(keepViewportStable);
+      window.setTimeout(keepViewportStable, 80);
       visual.explainTimer = window.setTimeout(() => {
         entry.motionElements.forEach((element) => element.classList.remove('is-explaining'));
       }, 2800);
@@ -164,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         element.setAttribute('aria-pressed', 'false');
         element.setAttribute('aria-label', `Explain ${entry.title}`);
         element.addEventListener('click', (event) => {
+          event.preventDefault();
           event.stopPropagation();
           selectEntry(entry, index);
         });
@@ -180,6 +195,10 @@ document.addEventListener('DOMContentLoaded', () => {
     visual.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && visual.classList.contains('has-selection')) clearSelection();
     });
+    const visualVisibility = new IntersectionObserver(([entry]) => {
+      visual.classList.toggle('is-in-view', entry.isIntersecting);
+    }, { threshold: .05 });
+    visualVisibility.observe(visual);
   });
 
   const postPage = document.querySelector('[data-post-page]');
