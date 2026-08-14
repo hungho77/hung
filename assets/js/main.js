@@ -111,6 +111,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const description = inspector?.querySelector('[data-inspector-description]');
     const impact = inspector?.querySelector('[data-inspector-impact]');
     const status = visual.querySelector('[data-visual-status]');
+    const inspectorClose = visual.querySelector('[data-inspector-close]');
+
+    const clearSelection = () => {
+      clearTimeout(visual.explainTimer);
+      visual.classList.remove('has-selection');
+      groups.forEach((group) => group.classList.remove('is-related'));
+      visual.querySelectorAll('.explainable').forEach((element) => {
+        element.classList.remove('is-selected', 'is-explaining');
+        element.setAttribute('aria-pressed', 'false');
+      });
+      inspector?.classList.remove('is-updating');
+      if (status) status.textContent = 'No component selected';
+    };
 
     const selectEntry = (entry, index) => {
       clearTimeout(visual.explainTimer);
@@ -136,12 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (description) description.textContent = entry.description;
       if (impact) impact.textContent = entry.impact;
       if (status) status.textContent = `Selected ${String(index + 1).padStart(2, '0')} / ${String(entries.length).padStart(2, '0')} · ${entry.title}`;
-      const inspectorBounds = inspector?.getBoundingClientRect();
-      if (inspectorBounds && (inspectorBounds.bottom > window.innerHeight - 16 || inspectorBounds.top < 16)) {
-        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const centeredTop = window.scrollY + inspectorBounds.top - (window.innerHeight - inspectorBounds.height) / 2;
-        window.scrollTo({ top: centeredTop, behavior: reduceMotion ? 'auto' : 'smooth' });
-      }
       visual.explainTimer = window.setTimeout(() => {
         entry.motionElements.forEach((element) => element.classList.remove('is-explaining'));
       }, 2800);
@@ -167,6 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
           selectEntry(entry, index);
         });
       });
+    });
+
+    inspectorClose?.addEventListener('click', clearSelection);
+    visual.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && visual.classList.contains('has-selection')) clearSelection();
     });
   });
 
