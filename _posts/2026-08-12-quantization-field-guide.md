@@ -12,7 +12,7 @@ paper_url: "https://docs.nvidia.com/deeplearning/tensorrt/10.x.x/inference-libra
 visual_title: "Real tensor → codebook → Q/DQ contract → native kernel"
 visual_alt: "Interactive TensorRT quantization map comparing integer and floating-point codebooks, explicit Q/DQ nodes, and the requirements for native low-precision execution"
 visual_caption: "A dtype names only part of the contract. Select each block to follow values into a codebook, compare scale schemes, inspect explicit Q/DQ placement, and test whether a native kernel turns compression into latency."
-visual_steps: ["Map real values", "Compare formats", "Read Q/DQ", "Verify the kernel"]
+visual_steps: ["Map real values", "Interpret stored codes", "Compare formats", "Read Q/DQ", "Verify the kernel"]
 ---
 
 Quantization is usually introduced as a conversion from floating-point values to fewer bits. That definition is mathematically correct and operationally incomplete.
