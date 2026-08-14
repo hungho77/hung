@@ -9,13 +9,13 @@ paper_year: "2022"
 learning_stage: Weight quantization
 visual_type: gptq
 paper_url: "https://arxiv.org/abs/2210.17323"
-visual_title: "Quantize, then compensate the remaining weights"
-visual_alt: "Animated GPTQ block diagram showing sequential weight quantization and Hessian guided error compensation"
-visual_caption: "GPTQ uses approximate second-order information to push each local quantization error into weights that have not yet been quantized."
-visual_steps: ["Select a block", "Propagate error", "Keep output close"]
+visual_title: "Inside GPTQ: one column, one block, then one lazy update"
+visual_alt: "Interactive redraw of GPTQ Figure 2 showing a Cholesky inverse Hessian beside a weight matrix with quantized columns, the active block, current column, and remaining updated weights"
+visual_caption: "Following Figure 2 and Algorithm 1: GPTQ quantizes columns in a shared order, compensates recursively inside a B-column block, then updates every remaining column once with the accumulated block error."
+visual_steps: ["Read the Hessian", "Quantize a column", "Update the block", "Apply the lazy update"]
 ---
 
-Round-to-nearest treats every weight error as independent. GPTQ asks a better question: after quantizing one weight, how should the remaining full-precision weights move so the layer output stays close to the original?
+Round-to-nearest treats every weight error as independent. GPTQ asks a better question: after quantizing one column across all output rows, how should the remaining full-precision columns move so the layer output stays close to the original?
 
 That second-order view is what allowed GPTQ to quantize models as large as 175 billion parameters to three or four bits in a few GPU hours, with much smaller quality loss than naive rounding.
 

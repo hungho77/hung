@@ -46,11 +46,44 @@
       </div>
       <div class="sq-equivalence" data-visual-step="3"><span>Y = XW = X̂Ŵ</span><strong>same output · W8A8-ready</strong><small>s is fused offline; no runtime activation scaling</small></div>
     {% when 'gptq' %}
-      <div class="gptq-grid visual-panel" data-visual-step="1"><small>WEIGHT BLOCK</small><div>{% for i in (1..20) %}<i></i>{% endfor %}</div></div>
-      <div class="gptq-arrow" data-visual-step="2"><span>quantize one column</span><i>→</i></div>
-      <div class="error-wave" data-visual-step="2"><i></i><i></i><i></i><i></i><span>H⁻¹</span></div>
-      <div class="gptq-grid corrected visual-panel" data-visual-step="3"><small>COMPENSATED BLOCK</small><div>{% for i in (1..20) %}<i></i>{% endfor %}</div></div>
-      <p class="visual-callout" data-visual-step="3">Error is redistributed through the remaining weights—not left behind.</p>
+      <div class="gptq-objective visual-panel" data-visual-step="1">
+        <small>LAYER RECONSTRUCTION OBJECTIVE</small>
+        <strong>min ‖WX − QX‖²</strong>
+        <span>H = 2XXᵀ + λI</span>
+      </div>
+      <div class="gptq-procedure" data-visual-step="2">
+        <div class="gptq-hessian visual-panel">
+          <header><small>INVERSE LAYER HESSIAN</small><strong>CHOLESKY FORM</strong></header>
+          <div class="gptq-cholesky" aria-hidden="true">{% for i in (1..8) %}<i{% if i == 5 %} class="gptq-active-hessian"{% endif %}></i>{% endfor %}</div>
+          <code>R = chol(H⁻¹)ᵀ</code>
+          <span>computed once</span>
+        </div>
+        <div class="gptq-coupling" aria-hidden="true"><span>guides</span><i>↔</i></div>
+        <div class="gptq-weight-matrix visual-panel">
+          <header><small>WEIGHT MATRIX · ALL ROWS</small><strong>ONE SHARED COLUMN ORDER</strong></header>
+          <div class="gptq-matrix-track">
+            <div class="gptq-done" aria-label="Already quantized columns">
+              {% for c in (1..2) %}<span class="gptq-col">{% for r in (1..5) %}<i></i>{% endfor %}</span>{% endfor %}
+            </div>
+            <div class="gptq-active-block" aria-label="Current block of columns">
+              <span class="gptq-col gptq-block-done">{% for r in (1..5) %}<i></i>{% endfor %}</span>
+              <span class="gptq-col gptq-current-col">{% for r in (1..5) %}<i></i>{% endfor %}</span>
+              <span class="gptq-col gptq-block-pending">{% for r in (1..5) %}<i></i>{% endfor %}</span>
+              <span class="gptq-local-flow" aria-hidden="true"><i></i></span>
+            </div>
+            <div class="gptq-remaining" aria-label="Remaining full precision columns">
+              {% for c in (1..3) %}<span class="gptq-col">{% for r in (1..5) %}<i></i>{% endfor %}</span>{% endfor %}
+              <span class="gptq-global-flow" aria-hidden="true"><i></i></span>
+            </div>
+          </div>
+          <div class="gptq-legend"><span><i class="done"></i>quantized</span><span><i class="current"></i>current column</span><span><i class="remaining"></i>updated later</span></div>
+        </div>
+      </div>
+      <div class="gptq-algorithm" data-visual-step="3">
+        <div class="gptq-quantize-step"><small>01 · COLUMN</small><strong>Q[:,j] ← quant(W[:,j])</strong><span>Quantize this column across every row.</span></div>
+        <div class="gptq-local-step"><small>02 · INSIDE BLOCK</small><strong>W[:,j:B] ← W − eⱼR[j,j:B]</strong><span>Compensate only later columns in the active block.</span></div>
+        <div class="gptq-global-step"><small>03 · LAZY UPDATE</small><strong>W[:,B:] ← W − ER[B,B:]</strong><span>After the block, update all remaining columns with one matrix operation.</span></div>
+      </div>
     {% when 'awq' %}
       <div class="activation-probe visual-panel" data-visual-step="1"><small>ACTIVATION PROBE</small><div class="probe-wave"><i></i><i></i><i></i><i></i><i></i></div><b>Which channels matter?</b></div>
       <div class="channel-bank visual-panel" data-visual-step="2"><small>WEIGHT CHANNELS</small>{% for i in (1..8) %}<i><span>c{{ i }}</span></i>{% endfor %}</div>
