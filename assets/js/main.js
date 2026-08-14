@@ -124,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         element.classList.remove('is-selected', 'is-explaining');
         element.setAttribute('aria-pressed', 'false');
       });
+      visual.querySelectorAll('.is-explaining').forEach((element) => element.classList.remove('is-explaining'));
       inspector?.classList.remove('is-updating');
       if (status) status.textContent = 'No component selected';
     };
@@ -133,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
       clearTimeout(visual.explainTimer);
       visual.classList.add('has-selection');
       groups.forEach((group) => group.classList.remove('is-related'));
+      visual.querySelectorAll('.is-explaining').forEach((element) => element.classList.remove('is-explaining'));
       visual.querySelectorAll('.explainable').forEach((element) => {
         element.classList.remove('is-selected', 'is-explaining');
         element.setAttribute('aria-pressed', 'false');
