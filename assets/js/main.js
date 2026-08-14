@@ -24,95 +24,141 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { once: true });
   });
 
+  const visualExplanations = {
+    'quant-map': [
+      { selector: '.quant-spectrum', kicker: 'REPRESENTATION', title: 'Continuous floating-point values', description: 'Floating point stores a wide dynamic range with sign, exponent, and mantissa. Nearby weights can remain numerically distinct.', impact: 'This preserves accuracy, but every decode step must move more weight bytes from memory.' },
+      { selector: '.visual-transfer', kicker: 'TRANSFORMATION', title: 'Scale, round, and clip', description: 'A scale maps the floating-point range onto integer codes: q = clip(round(x / s) + z). Values between codes are rounded; values outside the range are clipped.', impact: 'The scale is not bookkeeping. It decides which information survives quantization.' },
+      { selector: '.quant-grid', kicker: 'REPRESENTATION', title: 'Packed low-bit codes', description: 'The model now stores discrete codes rather than arbitrary real values. INT4 gives sixteen possible codes per quantization group.', impact: 'Memory falls only when the codes are actually packed instead of stored in a larger container.' },
+      { selector: '.visual-result', kicker: 'RUNTIME', title: 'A matching kernel closes the loop', description: 'Compression becomes speed only when the inference kernel reads the packed dtype and performs the correct scale or dequantization work efficiently.', impact: 'A smaller checkpoint without a native kernel can save disk space while adding latency.' }
+    ],
+    attention: [
+      { selector: '.token-stream', kicker: 'INPUT', title: 'Token states X', description: 'Each token enters attention as a d_model-dimensional hidden vector. The whole sequence is processed together during training or prefill.', impact: 'Sequence length controls both the score-matrix size and KV-cache growth.' },
+      { selector: '.qkv-stack span:nth-child(1)', kicker: 'PROJECTION', title: 'Query: what this token needs', description: 'The query vector describes the information the current token is trying to retrieve from the sequence.', impact: 'At decode time, the newest query is compared with every cached key.' },
+      { selector: '.qkv-stack span:nth-child(2)', kicker: 'PROJECTION', title: 'Key: what each token offers', description: 'Keys act like learned addresses. Their dot product with a query determines how relevant each source token is.', impact: 'Cached keys avoid recomputation, but consume memory proportional to context length.' },
+      { selector: '.qkv-stack span:nth-child(3)', kicker: 'PROJECTION', title: 'Value: the payload to retrieve', description: 'Values carry the information that will be mixed after the attention weights are known.', impact: 'Values form the other half of the KV cache and often dominate long-context traffic.' },
+      { selector: '.attention-matrix', kicker: 'COMPUTE', title: 'Scaled attention scores', description: 'QKᵀ / √dₖ creates one compatibility score for each query–key pair. Softmax turns each row into a normalized retrieval distribution.', impact: 'Materializing this n × n matrix is why naive attention becomes expensive at long sequence lengths.' },
+      { selector: '.attention-transfer', kicker: 'REDUCTION', title: 'Weighted value mixture', description: 'The softmax probabilities weight the value vectors, then reduce them into one context vector per query.', impact: 'Efficient attention kernels fuse this path to avoid repeatedly writing the score matrix to memory.' },
+      { selector: '.context-token', kicker: 'OUTPUT', title: 'Context-aware token', description: 'The output contains the original token’s newly retrieved context and continues through the output projection and residual path.', impact: 'During autoregressive decoding, this result produces one step before the next token can begin.' }
+    ],
+    int8: [
+      { selector: '.range-chart', kicker: 'CALIBRATION', title: 'Observed tensor distribution', description: 'Calibration records representative activation ranges instead of assuming every possible value is equally likely.', impact: 'Unrepresentative calibration data produces ranges that fail on real prompts, images, or robot trajectories.' },
+      { selector: '.visual-transfer', kicker: 'CALIBRATION', title: 'Choose the quantization range', description: 'A narrow range gives fine steps but clips outliers. A wide range preserves outliers but increases rounding error for common values.', impact: 'INT8 accuracy is largely a controlled trade-off between clipping and rounding error.' },
+      { selector: '.int8-ladder', kicker: 'REPRESENTATION', title: 'Map values onto the INT8 grid', description: 'Scale and zero-point map real values to integer levels. Per-channel weight scales usually follow each output channel more closely than one tensor-wide scale.', impact: 'Granularity often matters as much as the nominal eight-bit dtype.' },
+      { selector: '.visual-result', kicker: 'LIMIT', title: '256 representable codes', description: 'Signed INT8 provides 256 discrete codes. The scale determines how those codes cover the original real-valued range.', impact: 'The useful question is not “does INT8 work?” but which tensors, scales, and kernels make it work.' }
+    ],
+    smoothquant: [
+      { selector: '.activation-bars', kicker: 'PROBLEM', title: 'Activation outliers', description: 'A few channels can be much larger than the rest. One activation scale must cover those outliers, leaving coarse steps for normal values.', impact: 'This is the main reason naive W8A8 quantization can lose accuracy in large language models.' },
+      { selector: '.smooth-migration', kicker: 'TRANSFORMATION', title: 'Move difficulty offline', description: 'SmoothQuant divides activation channels by s and multiplies the matching weight channels by s before deployment.', impact: 'The operation is mathematically equivalent, so the full-precision layer output does not change.' },
+      { selector: '.weight-bars', kicker: 'WEIGHTS', title: 'Weights absorb the range', description: 'Weights are easier to quantize per output channel, so they absorb part of the activation outlier magnitude.', impact: 'The runtime receives smoother activations that fit a fast INT8 path.' },
+      { selector: '.equivalence-chip', kicker: 'INVARIANT', title: 'Same function, friendlier tensors', description: 'Y = (X / s)(sW) = XW. The model function is preserved before quantization; only the distribution of difficulty moves.', impact: 'Alpha controls how aggressively difficulty shifts from activations into weights.' }
+    ],
+    gptq: [
+      { selector: '.gptq-grid:not(.corrected)', kicker: 'INPUT', title: 'A block of full-precision weights', description: 'GPTQ processes a layer in blocks so the reconstruction problem remains tractable on large models.', impact: 'The objective is to preserve layer outputs on calibration activations, not minimize raw weight distance.' },
+      { selector: '.gptq-arrow', kicker: 'GREEDY STEP', title: 'Quantize one column', description: 'GPTQ commits a subset of weights to low-bit values, then measures the output error introduced by that decision.', impact: 'A naive greedy update would leave this error behind and compound it across the block.' },
+      { selector: '.error-wave', kicker: 'SECOND ORDER', title: 'Redistribute error with curvature', description: 'Inverse-Hessian information estimates which remaining weights can compensate for the committed quantization error.', impact: 'Sensitive directions receive smaller disturbance than directions the calibration data considers redundant.' },
+      { selector: '.corrected', kicker: 'OUTPUT', title: 'Compensated low-bit block', description: 'The remaining weights are updated before their own quantization step, preserving the block’s response more closely.', impact: 'This sequential dependency improves accuracy but makes GPTQ an offline weight-only method.' }
+    ],
+    awq: [
+      { selector: '.activation-probe', kicker: 'CALIBRATION', title: 'Activations reveal sensitive channels', description: 'AWQ observes which weight channels repeatedly receive large activation magnitudes on calibration samples.', impact: 'Sensitivity is inferred from how weights are used, not from weight magnitude alone.' },
+      { selector: '.channel-bank', kicker: 'SEARCH', title: 'Search channel-wise scaling', description: 'A small scaling search reduces quantization error around salient channels while keeping a regular weight-only representation.', impact: 'Regular structure is easier to map onto production kernels than arbitrary mixed precision.' },
+      { selector: '.awq-shield', kicker: 'PROTECTION', title: 'Protect the salient one percent', description: 'A small fraction of channels can dominate output quality. AWQ scales them before quantization rather than storing them at a separate dtype.', impact: 'Protecting the right channels preserves accuracy without destroying kernel regularity.' },
+      { selector: '.visual-result', kicker: 'RUNTIME', title: 'W4A16 weight-only execution', description: 'Weights are packed to four bits while activations remain FP16 or BF16. The kernel dequantizes weights close to the matrix operation.', impact: 'This targets bandwidth-bound decoding, where moving weights is often more expensive than arithmetic.' }
+    ],
+    lut: [
+      { selector: '.bit-packets', kicker: 'STORAGE', title: 'Bit-packed weight codes', description: 'Binary-coded quantization represents each low-bit weight using a small combination of basis values.', impact: 'Packed codes reduce weight traffic, the dominant cost in batch-one decoding.' },
+      { selector: '.visual-transfer:nth-of-type(2)', kicker: 'ADDRESSING', title: 'Use codes as table addresses', description: 'Instead of reconstructing every weight, the packed bit pattern selects a precomputed partial result.', impact: 'The lookup replaces repeated dequantization arithmetic with indexed access.' },
+      { selector: '.lookup-table', kicker: 'PRECOMPUTE', title: 'Lookup table of partial products', description: 'Small combinations of activations and basis values are computed once and stored in a table for reuse.', impact: 'The table is useful only while its access pattern remains cheaper than conventional multiply–accumulate.' },
+      { selector: '.visual-transfer:nth-of-type(4)', kicker: 'REDUCTION', title: 'Accumulate selected entries', description: 'Each packed code retrieves the corresponding table entry; selected partial products are accumulated into the output.', impact: 'Performance depends on lookup locality, packing overhead, and the target GPU architecture.' },
+      { selector: '.lut-output', kicker: 'OUTPUT', title: 'GEMM without reconstructing weights', description: 'The output is formed directly from table entries, so a separate dequantized weight tensor is never materialized.', impact: 'Avoiding reconstruction is the central systems claim of LUT-GEMM.' }
+    ],
+    spin: [
+      { selector: '.rotation-space.before', kicker: 'PROBLEM', title: 'Outliers aligned with unlucky axes', description: 'Quantization acts along coordinate axes. A few large coordinates can stretch the range even when the information itself is not inherently sparse.', impact: 'The same model can be easy or hard to quantize depending on its basis.' },
+      { selector: '.rotation-operator', kicker: 'TRANSFORMATION', title: 'Learn an orthogonal rotation', description: 'SpinQuant learns a rotation that redistributes energy while preserving the full-precision function through equivalent transformations.', impact: 'Orthogonality preserves geometry while changing which values the quantizer sees.' },
+      { selector: '.rotation-space.after', kicker: 'RESULT', title: 'Balanced coordinates', description: 'After rotation, extreme values are spread across dimensions and the per-tensor range is used more evenly.', impact: 'Weights, activations, and KV cache can survive aggressive W4A4KV4 quantization more reliably.' },
+      { selector: '.visual-callout', kicker: 'DEPLOYMENT', title: 'The rotation must be executable', description: 'A mathematically good basis is not enough: rotations must be fused, absorbed into weights, or implemented with acceptable overhead.', impact: 'End-to-end latency decides whether the quantization method is actually useful.' }
+    ],
+    paro: [
+      { selector: '.pair-bank', kicker: 'STRUCTURE', title: 'Split channels into pairs', description: 'ParoQuant partitions channels into independent two-dimensional subspaces rather than learning one dense rotation.', impact: 'Local structure sharply reduces calibration and execution complexity.' },
+      { selector: '.pair-rotations', kicker: 'TRANSFORMATION', title: 'Apply a 2 × 2 Givens rotation', description: 'Each pair learns one angle θ that redistributes its two channel magnitudes before quantization.', impact: 'A small rotation can tame local outliers while remaining cheap enough to integrate into kernels.' },
+      { selector: '.int4-lanes', kicker: 'LAYOUT', title: 'Keep regular INT4 lanes', description: 'Independent pair rotations preserve a predictable packed layout for low-bit execution.', impact: 'Hardware-friendly regularity matters more than fake-quantized accuracy alone.' },
+      { selector: '.visual-result', kicker: 'TRADE-OFF', title: 'Structured flexibility', description: 'Pairwise rotations are less expressive than a dense transform, but far easier to calibrate and deploy.', impact: 'The method trades a little mathematical freedom for a realistic path to TensorRT execution.' }
+    ],
+    vla: [
+      { selector: '.vla-pipeline > div:nth-of-type(1)', kicker: 'INPUT', title: 'Camera and sensor input', description: 'Images arrive at a fixed control cadence and must be decoded, normalized, and transferred before model inference begins.', impact: 'Input resolution and camera count determine the token workload before the VLA sees a single instruction.' },
+      { selector: '.vla-pipeline > div:nth-of-type(2)', kicker: 'VISION', title: 'Vision encoder', description: 'The encoder converts pixels into visual tokens. High resolution can create hundreds or thousands of tokens per frame.', impact: 'Token reduction here lowers downstream attention cost, KV-cache size, and latency together.' },
+      { selector: '.vla-pipeline > div:nth-of-type(3)', kicker: 'REASONING', title: 'Vision-language backbone', description: 'The backbone combines visual tokens with language and state context to produce task-aware hidden representations.', impact: 'Prefill is compute-heavy; autoregressive decoding is often weight- and cache-bandwidth bound.' },
+      { selector: '.vla-pipeline > div:nth-of-type(4)', kicker: 'CONTROL', title: 'Action head', description: 'The action head converts model state into discrete actions, trajectories, or continuous robot controls.', impact: 'Even a small head must meet the control-loop deadline and preserve temporal stability.' },
+      { selector: '.bottleneck-meter', kicker: 'MEASUREMENT', title: 'The bottleneck moves', description: 'Vision, language, and action stages have different shapes, batch sizes, and hardware utilization. Their shares change with the workload.', impact: 'Optimize measured stage latency rather than the operator that is currently fashionable.' },
+      { selector: '.visual-callout', kicker: 'SYSTEM RULE', title: 'Optimize the critical path', description: 'End-to-end control latency includes preprocessing, transfers, model stages, synchronization, and postprocessing.', impact: 'A faster model kernel is irrelevant if another stage still determines the robot’s response time.' }
+    ],
+    debug: [
+      { selector: '.debug-graph', kicker: 'SYMPTOM', title: 'A valid engine emits garbled tokens', description: 'Build success proves graph conversion completed; it does not prove that fused code, packed weights, or exported parameters are correct.', impact: 'One visible symptom can hide several independent defects.' },
+      { selector: '.debug-branches i:nth-child(1), .debug-probes span:nth-child(1)', kicker: 'FIX 01 · MYELIN', title: 'Horizontal FC fusion miscompile', description: 'On TensorRT 10.13 and sm_110, fusing gate_proj and up_proj corrupted FP16 output. Disabling that exact fusion restored correct generation.', impact: 'NVIDIA’s maintainer confirmed the proposed version-gate fix would be applied in a later release.' },
+      { selector: '.debug-branches i:nth-child(2), .debug-probes span:nth-child(2)', kicker: 'FIX 02 · CASK', title: 'NVFP4 epilogue fusion', description: 'NVFP4 became corrupt when CASK fused two or more epilogues into one GEMM. Limiting fusion to one preserved the same tactic pool and fixed output.', impact: 'The controlled change isolated generated epilogue code instead of merely swapping tactics.' },
+      { selector: '.debug-branches i:nth-child(3), .debug-probes span:nth-child(3)', kicker: 'FIX 03 · AWQ', title: 'Lossy asymmetric zero-points', description: 'Folding zero-points into four-bit nibbles and clamping to [0, 15] clipped important weights whenever a group zero-point was not eight.', impact: 'An exact runtime correction restored cosine similarity to 1.00000000 apart from FP16 rounding.' },
+      { selector: '.debug-branches i:nth-child(4), .debug-probes span:nth-child(4)', kicker: 'FIX 04 · EXPORT', title: 'Random InternVL3 text weights', description: 'The exporter silently matched none of the InternLM2 keys, then produced a complete ONNX graph initialized with random parameters.', impact: 'Bit-exact checkpoint mapping must be verified before debugging the runtime engine.' },
+      { selector: '.debug-output', kicker: 'METHOD', title: 'Isolate, patch, verify', description: 'Change one variable, reproduce the correction, then validate at tensor, logits, and generated-output levels.', impact: 'Controlled experiments turn “TensorRT is broken” into a precise, reviewable fix.' }
+    ]
+  };
+
   document.querySelectorAll('[data-article-visual]').forEach((visual) => {
-    const button = visual.querySelector('[data-visual-toggle]');
-    const label = button?.querySelector('span');
-    const canvas = visual.querySelector('.visual-canvas');
-    const phaseButtons = [...visual.querySelectorAll('[data-visual-phase]')];
-    const visualGroups = [...visual.querySelectorAll('[data-visual-step]')];
+    const entries = visualExplanations[visual.dataset.visualKind] || [];
+    const groups = [...visual.querySelectorAll('[data-visual-step]')];
+    const inspector = visual.querySelector('[data-visual-inspector]');
+    const kicker = inspector?.querySelector('[data-inspector-kicker]');
+    const title = inspector?.querySelector('[data-inspector-title]');
+    const description = inspector?.querySelector('[data-inspector-description]');
+    const impact = inspector?.querySelector('[data-inspector-impact]');
     const status = visual.querySelector('[data-visual-status]');
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const setToggle = (playing, mode = 'overview') => {
-      button?.setAttribute('aria-pressed', String(playing));
-      button?.setAttribute('aria-label', playing ? `Pause the ${mode} animation` : 'Play the complete concept animation');
-      if (label) label.textContent = playing ? 'Pause motion' : 'Play overview';
-    };
-
-    const resetGroups = () => {
-      visualGroups.forEach((group) => {
-        group.style.removeProperty('opacity');
-        group.style.removeProperty('filter');
+    const selectEntry = (entry, index) => {
+      clearTimeout(visual.explainTimer);
+      visual.classList.add('has-selection');
+      groups.forEach((group) => group.classList.remove('is-related'));
+      visual.querySelectorAll('.explainable').forEach((element) => {
+        element.classList.remove('is-selected', 'is-explaining');
+        element.setAttribute('aria-pressed', 'false');
       });
-    };
-
-    const selectPhase = (phaseButton) => {
-      const phase = phaseButton.dataset.visualPhase;
-      phaseButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === phaseButton)));
-
-      if (phase === 'all') {
-        canvas?.removeAttribute('data-phase');
-        visual.classList.remove('is-phase-playing');
-        visual.classList.add('is-paused');
-        resetGroups();
-        setToggle(false);
-        if (status) status.textContent = 'Static overview · choose a block to animate';
-        return;
-      }
-
-      canvas?.setAttribute('data-phase', phase);
-      visualGroups.forEach((group) => {
-        const active = group.dataset.visualStep === phase;
-        group.style.setProperty('opacity', active ? '1' : '.16', 'important');
-        group.style.filter = active ? 'none' : 'saturate(.45)';
+      entry.elements.forEach((element) => {
+        element.classList.add('is-selected');
+        element.setAttribute('aria-pressed', 'true');
+        element.closest('[data-visual-step]')?.classList.add('is-related');
       });
-      visual.classList.remove('is-paused', 'is-phase-playing');
       void visual.offsetWidth;
-      visual.classList.add('is-phase-playing');
-      setToggle(true, 'selected block');
-      const phaseLabel = phaseButton.querySelector('span')?.textContent?.trim() || `block ${phase}`;
-      if (status) status.textContent = reduceMotion ? `Selected 0${phase} · ${phaseLabel}` : `Animating 0${phase} · ${phaseLabel}`;
+      entry.elements.forEach((element) => element.classList.add('is-explaining'));
+      inspector?.classList.remove('is-updating');
+      void inspector?.offsetWidth;
+      inspector?.classList.add('is-updating');
+      if (kicker) kicker.textContent = entry.kicker;
+      if (title) title.textContent = entry.title;
+      if (description) description.textContent = entry.description;
+      if (impact) impact.textContent = entry.impact;
+      if (status) status.textContent = `Selected ${String(index + 1).padStart(2, '0')} / ${String(entries.length).padStart(2, '0')} · ${entry.title}`;
+      visual.explainTimer = window.setTimeout(() => {
+        entry.elements.forEach((element) => element.classList.remove('is-explaining'));
+      }, 2800);
     };
 
-    button?.addEventListener('click', () => {
-      const playing = button.getAttribute('aria-pressed') === 'true';
-      if (playing) {
-        visual.classList.add('is-paused');
-        setToggle(false);
-        if (status) status.textContent = 'Motion paused';
-        return;
-      }
-      canvas?.removeAttribute('data-phase');
-      resetGroups();
-      phaseButtons.forEach((item) => item.setAttribute('aria-pressed', String(item.dataset.visualPhase === 'all')));
-      visual.classList.remove('is-paused', 'is-phase-playing');
-      void visual.offsetWidth;
-      setToggle(true);
-      if (status) status.textContent = reduceMotion ? 'Complete concept selected' : 'Playing the complete concept';
-    });
-    phaseButtons.forEach((phaseButton) => {
-      phaseButton.addEventListener('click', () => selectPhase(phaseButton));
-    });
-
-    visualGroups.forEach((group) => {
-      const phase = group.dataset.visualStep;
-      const phaseButton = phaseButtons.find((item) => item.dataset.visualPhase === phase);
-      if (!phaseButton) return;
-      group.tabIndex = 0;
-      group.setAttribute('role', 'button');
-      group.setAttribute('aria-label', `Animate block 0${phase}: ${phaseButton.querySelector('span')?.textContent?.trim() || 'concept step'}`);
-      group.addEventListener('click', () => selectPhase(phaseButton));
-      group.addEventListener('keydown', (event) => {
-        if (!['Enter', ' '].includes(event.key)) return;
-        event.preventDefault();
-        selectPhase(phaseButton);
+    entries.forEach((entry, index) => {
+      entry.elements = [...visual.querySelectorAll(entry.selector)];
+      entry.elements.forEach((element) => {
+        element.classList.add('explainable');
+        element.tabIndex = 0;
+        element.setAttribute('role', 'button');
+        element.setAttribute('aria-pressed', 'false');
+        element.setAttribute('aria-label', `Explain ${entry.title}`);
+        element.addEventListener('click', (event) => {
+          event.stopPropagation();
+          selectEntry(entry, index);
+        });
+        element.addEventListener('keydown', (event) => {
+          if (!['Enter', ' '].includes(event.key)) return;
+          event.preventDefault();
+          event.stopPropagation();
+          selectEntry(entry, index);
+        });
       });
     });
-
-    visual.selectPhase = (phase) => {
-      const target = phaseButtons.find((item) => item.dataset.visualPhase === String(phase));
-      if (target) selectPhase(target);
-    };
   });
 
   const postPage = document.querySelector('[data-post-page]');
@@ -146,59 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
       link.textContent = heading.textContent;
       link.setAttribute('aria-label', `Section ${index + 1}: ${heading.textContent}`);
       toc.append(link);
-    });
-
-    const conceptVisual = document.querySelector('[data-article-visual]');
-    const conceptSteps = [...(conceptVisual?.querySelectorAll('[data-visual-phase]:not([data-visual-phase="all"])') || [])];
-    const reduceSectionMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const sectionOutcomes = ['Input and evidence', 'Mechanism and transformation', 'Deployment consequence'];
-    headings.forEach((heading, index) => {
-      const phase = Math.min(3, Math.floor((index * 3) / Math.max(1, headings.length)) + 1);
-      const nextParagraph = [...postContent.children].slice([...postContent.children].indexOf(heading) + 1).find((element) => element.tagName === 'P');
-      const rawSummary = nextParagraph?.textContent?.replace(/\s+/g, ' ').trim() || 'Use the motion to connect this section to the article’s main concept.';
-      const summary = rawSummary.length > 150 ? `${rawSummary.slice(0, 147).trim()}…` : rawSummary;
-      const mappedStep = conceptSteps[phase - 1]?.querySelector('span')?.textContent?.trim() || `Concept block ${phase}`;
-      const motion = document.createElement('aside');
-      motion.className = 'section-motion article-reveal';
-      motion.dataset.sectionMotion = String(phase);
-      motion.setAttribute('aria-label', `Interactive explanation for ${heading.textContent}`);
-
-      const kicker = document.createElement('span');
-      kicker.className = 'section-motion-kicker';
-      kicker.textContent = `SECTION MOTION · 0${phase}`;
-      const flow = document.createElement('div');
-      flow.className = 'section-motion-flow';
-      [heading.textContent, mappedStep, sectionOutcomes[phase - 1]].forEach((text, nodeIndex) => {
-        const node = document.createElement('span');
-        node.className = 'section-motion-node';
-        node.dataset.node = String(nodeIndex + 1);
-        node.textContent = text;
-        flow.append(node);
-        if (nodeIndex < 2) {
-          const connector = document.createElement('i');
-          connector.setAttribute('aria-hidden', 'true');
-          connector.textContent = '→';
-          flow.append(connector);
-        }
-      });
-      const footer = document.createElement('div');
-      footer.className = 'section-motion-footer';
-      const note = document.createElement('p');
-      note.textContent = summary;
-      const replay = document.createElement('button');
-      replay.type = 'button';
-      replay.textContent = reduceSectionMotion ? 'Select block' : 'Animate section';
-      replay.setAttribute('aria-label', `Animate the explanation for ${heading.textContent}`);
-      replay.addEventListener('click', () => {
-        motion.classList.remove('is-playing');
-        void motion.offsetWidth;
-        motion.classList.add('is-playing');
-        conceptVisual?.selectPhase?.(phase);
-        replay.textContent = reduceSectionMotion ? 'Selected' : 'Replay motion';
-      });
-      footer.append(note, replay);
-      motion.append(kicker, flow, footer);
-      heading.insertAdjacentElement('afterend', motion);
     });
 
     postContent.querySelectorAll('table').forEach((table) => {

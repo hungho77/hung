@@ -1,9 +1,9 @@
-<figure id="concept-visual" class="article-visual visual-{{ page.visual_type }} is-paused" data-article-visual>
+<figure id="concept-visual" class="article-visual visual-{{ page.visual_type }}" data-article-visual data-visual-kind="{{ page.visual_type }}">
   <header class="visual-header">
     <div><span>CONCEPT VISUAL · {{ page.paper_year }}</span><strong>{{ page.visual_title }}</strong></div>
-    <button type="button" data-visual-toggle aria-pressed="false" aria-label="Play the complete concept animation"><i aria-hidden="true"></i><span>Play overview</span></button>
+    <span class="visual-mode"><i aria-hidden="true"></i> Select a component</span>
   </header>
-  <div class="visual-canvas" role="img" aria-label="{{ page.visual_alt }}">
+  <div class="visual-canvas" role="group" aria-label="{{ page.visual_alt }}">
     {% case page.visual_type %}
     {% when 'quant-map' %}
       <div class="quant-spectrum visual-panel" data-visual-step="1"><small>FLOATING POINT</small><div class="spectrum-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><b>CONTINUOUS VALUES</b></div>
@@ -64,14 +64,19 @@
       <div class="debug-output" data-visual-step="3"><span>ISOLATE</span><b>→</b><span>PATCH</span><b>→</b><span>VERIFY</span><strong>clean output ✓</strong></div>
     {% endcase %}
   </div>
-  <div class="visual-steps" aria-label="Explore this concept">
-    {% for step in page.visual_steps %}
-    <button type="button" data-visual-phase="{{ forloop.index }}" aria-pressed="false"><small>0{{ forloop.index }}</small><span>{{ step }}</span></button>
-    {% endfor %}
-    <button class="visual-reset" type="button" data-visual-phase="all" aria-pressed="true"><small>↻</small><span>Reset view</span></button>
-  </div>
-  <div class="visual-status" aria-live="polite">
-    <span data-visual-status>Static overview · choose a block to animate</span>
+  <aside class="visual-inspector" data-visual-inspector aria-live="polite">
+    <div class="visual-inspector-main">
+      <span data-inspector-kicker>HOW TO EXPLORE</span>
+      <h3 data-inspector-title>Select any outlined component</h3>
+      <p data-inspector-description>{{ page.visual_caption }}</p>
+    </div>
+    <div class="visual-inspector-impact">
+      <span>WHY IT MATTERS</span>
+      <p data-inspector-impact>The visual stays still until you choose a component. Motion is used once to reveal that component’s role in the system.</p>
+    </div>
+  </aside>
+  <div class="visual-status">
+    <span data-visual-status>No component selected</span>
     {% if page.paper_url %}<a href="{{ page.paper_url }}">Interactive redraw · original source ↗</a>{% endif %}
   </div>
   <figcaption><span>HOW TO READ IT</span>{{ page.visual_caption }}</figcaption>
